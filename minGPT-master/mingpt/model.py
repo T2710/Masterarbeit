@@ -16,7 +16,6 @@ from torch.nn import functional as F
 
 from mingpt.utils import CfgNode as CN
 
-# -----------------------------------------------------------------------------
 
 class NewGELU(nn.Module):
     """
@@ -50,23 +49,29 @@ class CausalSelfAttention(nn.Module):
         self.n_embd = config.n_embd
 
     def forward(self, x):
-        B, T, C = x.size() # batch size, sequence length, embedding dimensionality (n_embd)
+        # B = batch size, T = sequence length, C = embedding dimension (n_embd)
+        B, T, C = x.size()
 
-        # calculate query, key, values for all heads in batch and move head forward to be the batch dim
+        # Project once to get Q, K, V and then split into three tensors.
         q, k ,v  = self.c_attn(x).split(self.n_embd, dim=2)
+        # Reshape into multiple heads: (B, nh, T, hs).
         k = k.view(B, T, self.n_head, C // self.n_head).transpose(1, 2) # (B, nh, T, hs)
         q = q.view(B, T, self.n_head, C // self.n_head).transpose(1, 2) # (B, nh, T, hs)
         v = v.view(B, T, self.n_head, C // self.n_head).transpose(1, 2) # (B, nh, T, hs)
 
-        # causal self-attention; Self-attend: (B, nh, T, hs) x (B, nh, hs, T) -> (B, nh, T, T)
+        # Scaled dot-product attention scores.
         att = (q @ k.transpose(-2, -1)) * (1.0 / math.sqrt(k.size(-1)))
+        # Causal mask: prevent attention to future positions.
         att = att.masked_fill(self.bias[:,:,:T,:T] == 0, float('-inf'))
+        # Normalize scores into probabilities.
         att = F.softmax(att, dim=-1)
         att = self.attn_dropout(att)
+        # Weighted sum of values per head.
         y = att @ v # (B, nh, T, T) x (B, nh, T, hs) -> (B, nh, T, hs)
+        # Merge heads back to (B, T, C).
         y = y.transpose(1, 2).contiguous().view(B, T, C) # re-assemble all head outputs side by side
 
-        # output projection
+        # Final projection back to embedding space.
         y = self.resid_dropout(self.c_proj(y))
         return y
 
@@ -308,3 +313,5 @@ class GPT(nn.Module):
             idx = torch.cat((idx, idx_next), dim=1)
 
         return idx
+
+
