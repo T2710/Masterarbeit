@@ -239,20 +239,15 @@ class GPT(nn.Module):
 
         return model
 
-
-
-
-# ------------------- Training Setup -------------------
-import tiktoken
-import time
-
 class DataLoaderLite:
-    def __init__(self, B, T):
+    def __init__(self, B, T, process_rank, num_processes):
         self.B = B
         self.T = T
+        self.process_rank = process_rank
+        self.num_processes = num_processes
 
         # Load data batch
-        with open('input.txt', 'r') as f:
+        with open('source/input.txt', 'r') as f:
             text = f.read()
         enc = tiktoken.get_encoding("gpt2")
         tokens = enc.encode(text)
@@ -260,32 +255,47 @@ class DataLoaderLite:
         print(f"Data has {self.tokens.size(0)} tokens")
         print(f"1 epoch = {self.tokens.size(0) // (B * T)} batches")
 
-        self.current_position = 0
+        self.current_position = self.B * self.T * self.process_rank
 
     def next_batch(self):
         B, T = self.B, self.T
         buf = self.tokens[self.current_position:self.current_position + B*T + 1]
         x = buf[:-1].view(B, T)
         y = buf[1:].view(B, T)
-        self.current_position += B * T
+        self.current_position += B * T * self.num_processes
         # Reset if loading the next batch exceeds data length
-        if self.current_position + B * T + 1 >= self.tokens.size(0):
-            self.current_position = 0
+        if self.current_position + B * T * self.num_processes + 1 >= self.tokens.size(0):
+            self.current_position = self.B * self.T * self.process_rank
         return x, y
 
 
-device = 'cuda' if torch.cuda.is_available() else 'cpu'
-torch.manual_seed(1337)
-torch.cuda.manual_seed(1337)
+# ------------------- Training Setup -------------------
+import os
+import tiktoken
+import time
+from torch.distributed import init_process_group, destroy_process_group
+from torch.nn.parallel import DistributedDataParallel as DDP
+import torch.distributed as dist
 
-train_loader = DataLoaderLite(B = 4, T = 1024)
-torch.set_float32_matmul_precision('high')
-
-# Numbers devisible by 2 are faster due to gpu architecture, Add fake vocab size to make it devisible by 2, 8 etc.
-model = GPT(GPTConfig(vocab_size=50304))
-model.to(device)
-# model = torch.compile(model)
-
+"""
+Set up DDP (distributed Data Parallel) if multiple GPUs are available.
+"""
+ddp = int(os.environ.get('RANK', -1)) != -1 # check if ddp is to be used
+if ddp:
+    assert torch.cuda.is_available(), "DDP mode requires CUDA."
+    init_process_group(backend='nccl')
+    ddp_rank = int(os.environ['RANK']) # global rank of this process
+    ddp_local_rank = int(os.environ['LOCAL_RANK']) # GPU index for this process
+    ddp_world_size = int(os.environ['WORLD_SIZE']) # total number of gpus/processes
+    torch.cuda.set_device(ddp_local_rank)
+    master_process = ddp_rank == 0 # this process (number 0) will do logging tasks
+else: 
+    # non ddp mode
+    ddp_rank = 0
+    ddp_local_rank = 0
+    ddp_world_size = 1
+    master_process = True
+    device = 'cuda' if torch.cuda.is_available() else 'cpu'
 
 # Learning Rate adjustment over time
 max_lr = 6e-4
@@ -305,17 +315,57 @@ def get_lr(it):
     coeff = 0.5 * (1.0 + math.cos(math.pi * decay_ratio))
     return min_lr + coeff * (max_lr - min_lr)
 
+torch.manual_seed(1337)
+torch.cuda.manual_seed(1337)
+
+"""
+Use Batch Size = 0.5 M because it matches the other Hyperparameters from the GPT paper
+Symiulate this by accumulating gradients over multiple smaller batches if necessary because of GPU memory limits
+16 * 1024 = 16384 tokens per step -> 524288 / 16384 = 32 gradient accumulation steps to reach total batch size
+Split the total batch size into smaller micro-batches bevor Backpropagation by accumulating gradients
+"""
+total_batch_size = 524288 # ~ 0.5M tokens per step
+B = 4
+T = 1024
+assert total_batch_size % (B * T * ddp_world_size) == 0
+grad_accum_steps = total_batch_size // (B * T * ddp_world_size)
+if master_process:
+    print(f"total desired batch size: {total_batch_size}")
+    print(f"calculated gradient accumulation steps: {grad_accum_steps}")
+
+# B = batch size, T = sequence length e.g. -> B = 6, T = 1024 = 6 Sequences of 1024 tokens each
+train_loader = DataLoaderLite(B = B, T = T, process_rank=ddp_rank, num_processes=ddp_world_size)
+torch.set_float32_matmul_precision('high')
+
+# Numbers devisible by 2 are faster due to gpu architecture, Add fake vocab size to make it devisible by 2, 8 etc.
+model = GPT(GPTConfig(vocab_size=50304))
+model.to(device)
+# model = torch.compile(model) # Use only on Uni Cluster
+if ddp:
+    model = DDP(model, device_ids=[ddp_local_rank])
+raw_model = model.module if ddp else model
+
+
 # optimize the model according to GPT-3 Paper, because they didnt publish in the GPT-2 paper
-optimizer = model.configure_optimizers(weight_decay=0.1, learning_rate= 6e-4, device_type=device)
+optimizer = raw_model.configure_optimizers(weight_decay=0.1, learning_rate= 6e-4, device_type=device)
 
 for step in range(max_steps):
     t0 = time.time()
-    x, y = train_loader.next_batch()
-    x, y = x.to(device), y.to(device)
     optimizer.zero_grad()
-    with torch.autocast(device_type=device, dtype=torch.bfloat16):
-        logits, loss = model(x, y)
-    loss.backward()
+    loss_accum = 0.0
+    for micro_step in range(grad_accum_steps):
+        x, y = train_loader.next_batch()
+        x, y = x.to(device), y.to(device)
+        with torch.autocast(device_type=device, dtype=torch.bfloat16):
+            logits, loss = model(x, y)
+        loss = loss / grad_accum_steps
+        loss_accum += loss.detach()
+        if ddp:
+            model.requires_backward_grad_sync = (micro_step == grad_accum_steps - 1)
+        loss.backward()
+    # in ddp, average the loss across processes
+    if ddp:
+        dist.all_reduce(loss_accum, op=dist.ReduceOp.AVG)
     # Clip gradients to prevent exploding gradients for example in bad Batches
     norm = torch.nn.utils.clip_grad_norm_(model.parameters(), 1.0)
     # determine the learning rate for this step
@@ -326,30 +376,11 @@ for step in range(max_steps):
     torch.cuda.synchronize()
     t1 = time.time()
     dt = (t1 - t0)*1000
-    tokens_per_step = (train_loader.B * train_loader.T) / (t1 - t0)
-    print(f"Step {step} | loss: {loss.item()} | lr: {lr:.4e} | norm: {norm:.4f} | dt: {dt:.2f}ms | tokens/sec: {tokens_per_step:.2f}")
+    tokens_processed = train_loader.B * train_loader.T * grad_accum_steps * ddp_world_size
+    tokens_per_step = tokens_processed / dt
+    if master_process:
+        print(f"Step {step} | loss: {loss_accum.item():.6f} | lr: {lr:.4e} | norm: {norm:.4f} | dt: {dt:.2f}ms | tokens/sec: {tokens_per_step:.2f}")
 
+if ddp:
+    destroy_process_group()
 
-# num_return_sequences = 5
-# max_length = 30
-# tokens = enc.encode("Hello, I'm a language model,")
-# tokens = torch.tensor(tokens, dtype=torch.long)
-# tokens = tokens.unsqueeze(0).repeat(num_return_sequences, 1)
-# x = tokens.to('cuda')
-
-
-
-# while x.size(1) < max_length:
-#     with torch.no_grad():
-#         logits = model(x)
-#         logits = logits[:, -1, :]
-#         probs = F.softmax(logits, dim=-1)
-#         topk_probs, topk_indices = torch.topk(probs, k=50, dim=-1)
-#         ix = torch.multinomial(topk_probs, 1)
-#         xcol = torch.gather(topk_indices, -1, ix)
-#         x = torch.cat((x, xcol), dim=1)
-
-# for i in range(num_return_sequences):
-#     tokens = x[i, :max_length].tolist()
-#     decoded = enc.decode(tokens)
-#     print(">", decoded)
