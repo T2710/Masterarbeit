@@ -246,7 +246,6 @@ class GPT(nn.Module):
 
         return model
 
-
 def load_tokens(filename):
     npt = np.load(filename)
     ptt = torch.tensor(npt, dtype=torch.long)
@@ -261,7 +260,7 @@ class DataLoaderLite:
         self.split = split
         assert split in {"train", "val"}
 
-        data_root = "source/datasets/edu_fineweb10B"
+        data_root = "my_gpt2/source/datasets/edu_fineweb10B"
         if not os.path.isdir(data_root):
             raise FileNotFoundError(
                 f"data_root='{data_root}' not found. "
@@ -279,19 +278,21 @@ class DataLoaderLite:
     
     def reset(self):
         self.current_shard = 0
-        self.tokens = load_tokens(self.shards[self.current_position])
+        self.tokens = load_tokens(self.shards[self.current_shard])
         self.current_position = self.B * self.T * self.process_rank
-
 
     def next_batch(self):
         B, T = self.B, self.T
-        buf = self.tokens[self.current_position:self.current_position + B*T + 1]
-        x = buf[:-1].view(B, T)
-        y = buf[1:].view(B, T)
+        buf = self.tokens[self.current_position : self.current_position+B*T+1]
+        x = (buf[:-1]).view(B, T) # inputs
+        y = (buf[1:]).view(B, T) # targets
+        # advance the position in the tensor
         self.current_position += B * T * self.num_processes
-        # Reset if loading the next batch exceeds data length
-        if self.current_position + B * T * self.num_processes + 1 >= self.tokens.size(0):
-            self.current_position = self.B * self.T * self.process_rank
+        # if loading the next batch would be out of bounds, advance to next shard
+        if self.current_position + (B * T * self.num_processes + 1) > len(self.tokens):
+            self.current_shard = (self.current_shard + 1) % len(self.shards)
+            self.tokens = load_tokens(self.shards[self.current_shard])
+            self.current_position = B * T * self.process_rank
         return x, y
 
 # for hellaswag datset evaluation
@@ -323,6 +324,25 @@ from torch.nn.parallel import DistributedDataParallel as DDP
 import torch.distributed as dist
 
 """
+Load Trainingsdata
+"""
+DATA_ROOT = "my_gpt2/source/datasets/edu_fineweb10B"
+
+def shards_exist(data_root):
+    if not os.path.isdir(data_root):
+        return False
+    files = os.listdir(data_root)
+    return any("train" in f or "val" in f for f in files)
+
+if not shards_exist(DATA_ROOT):
+    print("No shards found. Building dataset shards...")
+    builder = DatasetBuilder("edu_fineweb10B", base_dir="my_gpt2/source/datasets")
+    builder.build_shards()
+    print("Shard building finished.")
+else:
+    print("Shards already exist. Skipping dataset build.")
+
+"""
 Set up DDP (distributed Data Parallel) if multiple GPUs are available.
 """
 ddp = int(os.environ.get('RANK', -1)) != -1 # check if ddp is to be used
@@ -332,6 +352,7 @@ if ddp:
     ddp_rank = int(os.environ['RANK']) # global rank of this process
     ddp_local_rank = int(os.environ['LOCAL_RANK']) # GPU index for this process
     ddp_world_size = int(os.environ['WORLD_SIZE']) # total number of gpus/processes
+    device = f'cuda:{ddp_local_rank}'
     torch.cuda.set_device(ddp_local_rank)
     master_process = ddp_rank == 0 # this process (number 0) will do logging tasks
 else: 
@@ -341,6 +362,8 @@ else:
     ddp_world_size = 1
     master_process = True
     device = 'cuda' if torch.cuda.is_available() else 'cpu'
+
+device_type = "cuda" if device.startswith("cuda") else "cpu"
 
 # Learning Rate adjustment over time
 max_lr = 6e-4
@@ -396,7 +419,7 @@ raw_model = model.module if ddp else model
 
 
 # optimize the model according to GPT-3 Paper, because they didnt publish in the GPT-2 paper
-optimizer = raw_model.configure_optimizers(weight_decay=0.1, learning_rate= 6e-4, device_type=device)
+optimizer = raw_model.configure_optimizers(weight_decay=0.1, learning_rate= 6e-4, device_type=device_type)
 
 # create log
 log_dir = "log"
@@ -419,7 +442,7 @@ for step in range(max_steps):
             for _ in range(val_loss_step):
                 x, y = val_loader.next_batch()
                 x, y = x.to(device), y.to(device)
-                with torch.autocast(device_type=device, dtype=torch.bfloat16):
+                with torch.autocast(device_type=device_type, dtype=torch.bfloat16):
                     logits, loss = model(x, y)
                 loss = loss / val_loss_step
                 val_loss_accum += loss.detach()
@@ -457,7 +480,7 @@ for step in range(max_steps):
             mask = mask.to(device)
             # get the logits
             with torch.no_grad():
-                with torch.autocast(device_type=device, dtype=torch.bfloat16):
+                with torch.autocast(device_type=device_type, dtype=torch.bfloat16):
                     logits, loss = model(tokens)
                 pred_norm = get_most_likely_row(tokens, mask, logits)
             num_total += 1
@@ -490,7 +513,7 @@ for step in range(max_steps):
         while xgen.size(1) < max_length:
             # forward the model to get the logits
             with torch.no_grad():
-                with torch.autocast(device_type=device, dtype=torch.bfloat16):
+                with torch.autocast(device_type=device_type, dtype=torch.bfloat16):
                     logits, loss = model(xgen) # (B, T, vocab_size)
                 # take the logits at the last position
                 logits = logits[:, -1, :] # (B, vocab_size)
@@ -519,12 +542,12 @@ for step in range(max_steps):
     for micro_step in range(grad_accum_steps):
         x, y = train_loader.next_batch()
         x, y = x.to(device), y.to(device)
-        with torch.autocast(device_type=device, dtype=torch.bfloat16):
+        with torch.autocast(device_type=device_type, dtype=torch.bfloat16):
             logits, loss = model(x, y)
         loss = loss / grad_accum_steps
         loss_accum += loss.detach()
         if ddp:
-            model.requires_backward_grad_sync = (micro_step == grad_accum_steps - 1)
+            model.require_backward_grad_sync = (micro_step == grad_accum_steps - 1)
         loss.backward()
     # in ddp, average the loss across processes
     if ddp:
@@ -536,9 +559,10 @@ for step in range(max_steps):
     for param_group in optimizer.param_groups:
         param_group['lr'] = lr
     optimizer.step()
-    torch.cuda.synchronize()
+    if device_type == "cuda":
+        torch.cuda.synchronize() 
     t1 = time.time()
-    dt = (t1 - t0)*1000
+    dt = t1 - t0
     tokens_processed = train_loader.B * train_loader.T * grad_accum_steps * ddp_world_size
     tokens_per_sec = tokens_processed / dt
     if master_process:

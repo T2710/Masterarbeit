@@ -25,7 +25,7 @@ DATASETS = {
 
 
 class DatasetBuilder:
-    def __init__(self, dataset, base_dir="source/datasets"):
+    def __init__(self, dataset, base_dir="my_gpt2/source/datasets"):
         if dataset not in DATASETS:
             raise ValueError(f"Unknown dataset: {dataset}")
         self.dataset = dataset
