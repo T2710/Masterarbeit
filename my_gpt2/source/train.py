@@ -5,8 +5,9 @@ import inspect
 import torch
 import torch.nn as nn
 from torch.nn import functional as F
-from dataloader import DatasetBuilder
-from my_gpt2.source.datasets import render_example, iterate_examples
+from my_gpt2.source.dataloader import DatasetBuilder
+from my_gpt2.source.hellaswag import render_example, iterate_examples
+
 
 """
 To optimize training time: 
@@ -371,7 +372,7 @@ else:
 max_lr = 6e-4
 min_lr = max_lr *0.1
 warmup_steps = 715
-max_steps = 19073
+max_steps = 19073 * 4
 def get_lr(it):
     # 1. linear warmup for warmup_steps
     if it < warmup_steps:

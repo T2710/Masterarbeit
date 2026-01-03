@@ -2,19 +2,19 @@
 #SBATCH --job-name=RunSimulation
 #SBATCH --output=logs/Logs%j.out
 #SBATCH --error=logs/Logs%j.err
-#SBATCH --time=00:30:00
+#SBATCH --time=72:00:00
 #SBATCH --ntasks=1
 #SBATCH --cpus-per-task=2
 #SBATCH --mem=127G
-#SBATCH --gres=gpu:1
-#SBATCH --partition=dev_gpu_h100
+#SBATCH --gres=gpu:4 
+#SBATCH --partition=gpu_h100
 
 echo "Job started ..."
 
 source ~/.bashrc
 conda activate llm-env
 
-cd /pfs/data6/home/ul/ul_student/ul_raf24/github/Masterarbeit/minGPT-master
+cd /pfs/data6/home/ul/ul_student/ul_raf24/github/Masterarbeit
 
 export PYTHONUNBUFFERED=1
 mkdir -p logs
@@ -22,7 +22,7 @@ mkdir -p logs
 python -c "import torch; print('CUDA available:', torch.cuda.is_available()); \
 print('Device:', torch.cuda.get_device_name(0) if torch.cuda.is_available() else 'CPU')"
 
-python -u projects/openThoughts-114k/train.py
+torchrun --standalone --nproc_per_node=4 -m my_gpt2.source.train
 
 echo "Job completed."
 
@@ -35,4 +35,6 @@ echo "Job completed."
 # squeue --start
 
 # conda activate llm-env
-# $ salloc --partition=dev_gpu_h100 --ntasks=1 --time=30 --mem=5000 --gres=gpu:1
+# salloc --partition=dev_gpu_h100 --ntasks=1 --time=30 --mem=5000 --gres=gpu:1
+# python -m my_gpt2.source.train
+# torchrun --standalone --nproc_per_node=1 -m my_gpt2.source.train
