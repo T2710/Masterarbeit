@@ -323,24 +323,6 @@ from torch.distributed import init_process_group, destroy_process_group
 from torch.nn.parallel import DistributedDataParallel as DDP
 import torch.distributed as dist
 
-"""
-Load Trainingsdata
-"""
-DATA_ROOT = "my_gpt2/source/datasets/edu_fineweb10B"
-
-def shards_exist(data_root):
-    if not os.path.isdir(data_root):
-        return False
-    files = os.listdir(data_root)
-    return any("train" in f or "val" in f for f in files)
-
-if not shards_exist(DATA_ROOT):
-    print("No shards found. Building dataset shards...")
-    builder = DatasetBuilder("edu_fineweb10B", base_dir="my_gpt2/source/datasets")
-    builder.build_shards()
-    print("Shard building finished.")
-else:
-    print("Shards already exist. Skipping dataset build.")
 
 """
 Set up DDP (distributed Data Parallel) if multiple GPUs are available.
@@ -364,6 +346,26 @@ else:
     device = 'cuda' if torch.cuda.is_available() else 'cpu'
 
 device_type = "cuda" if device.startswith("cuda") else "cpu"
+
+"""
+Load Trainingsdata
+"""
+DATA_ROOT = "my_gpt2/source/datasets/edu_fineweb10B"
+
+def shards_exist(data_root):
+    if not os.path.isdir(data_root):
+        return False
+    files = os.listdir(data_root)
+    return any("train" in f or "val" in f for f in files)
+
+if not shards_exist(DATA_ROOT) and master_process:
+    print("No shards found. Building dataset shards...")
+    builder = DatasetBuilder("edu_fineweb10B", base_dir="my_gpt2/source/datasets")
+    builder.build_shards()
+    print("Shard building finished.")
+else:
+    print("Shards already exist. Skipping dataset build.")
+
 
 # Learning Rate adjustment over time
 max_lr = 6e-4
