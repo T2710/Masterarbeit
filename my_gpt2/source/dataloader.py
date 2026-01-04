@@ -96,3 +96,10 @@ class DatasetBuilder:
                 split = "val" if shard_index == 0 else "train"
                 filename = self.dataset_dir / f"{shard_prefix}_{split}_{shard_index:06d}"
                 self.write_datafile(str(filename), all_tokens_np[:token_count])
+
+
+
+if __name__ == "__main__":
+    dataloader = DatasetBuilder("edu_fineweb10B")
+    dataloader.load()
+    dataloader.build_shards()

@@ -19,6 +19,10 @@ To optimize training time:
 """
 Todo:
 Fix torch compile
+1. Pretraining
+2. SFT
+3. SFT auf Reasoningdaten
+4. RL mit Reasoningdaten
 """
 
 # 1. SSFT with The Pile Dataset 2. SFT with OpenAssistent Dataset
@@ -348,25 +352,7 @@ else:
 
 device_type = "cuda" if device.startswith("cuda") else "cpu"
 
-"""
-Load Trainingsdata
-"""
 DATA_ROOT = "my_gpt2/source/datasets/edu_fineweb10B"
-
-def shards_exist(data_root):
-    if not os.path.isdir(data_root):
-        return False
-    files = os.listdir(data_root)
-    return any("train" in f or "val" in f for f in files)
-
-if not shards_exist(DATA_ROOT) and master_process:
-    print("No shards found. Building dataset shards...")
-    builder = DatasetBuilder("edu_fineweb10B", base_dir="my_gpt2/source/datasets")
-    builder.build_shards()
-    print("Shard building finished.")
-else:
-    print("Shards already exist. Skipping dataset build.")
-
 
 # Learning Rate adjustment over time
 max_lr = 6e-4
@@ -576,3 +562,6 @@ if ddp:
     destroy_process_group()
 
 # torchrun --standalone --nproc_per_node=8 trainer.py
+
+
+

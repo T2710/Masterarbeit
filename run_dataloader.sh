@@ -2,12 +2,12 @@
 #SBATCH --job-name=RunSimulation
 #SBATCH --output=logs/Logs%j.out
 #SBATCH --error=logs/Logs%j.err
-#SBATCH --time=72:00:00
+#SBATCH --time=00:30:00
 #SBATCH --ntasks=1
 #SBATCH --cpus-per-task=2
 #SBATCH --mem=127G
 #SBATCH --gres=gpu:4 
-#SBATCH --partition=gpu_h100
+#SBATCH --partition=dev_gpu_h100
 
 echo "Job started ..."
 
@@ -22,7 +22,7 @@ mkdir -p logs
 python -c "import torch; print('CUDA available:', torch.cuda.is_available()); \
 print('Device:', torch.cuda.get_device_name(0) if torch.cuda.is_available() else 'CPU')"
 
-torchrun --standalone --nproc_per_node=4 -m my_gpt2.source.train
+python -m my_gpt2.source.dataloader
 
 echo "Job completed."
 
