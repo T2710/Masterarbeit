@@ -2,12 +2,12 @@
 #SBATCH --job-name=RunSimulation
 #SBATCH --output=logs/Logs%j.out
 #SBATCH --error=logs/Logs%j.err
-#SBATCH --time=00:30:00
+#SBATCH --time=03:30:00
 #SBATCH --ntasks=1
 #SBATCH --cpus-per-task=2
 #SBATCH --mem=127G
-#SBATCH --gres=gpu:4 
-#SBATCH --partition=dev_gpu_h100
+#SBATCH --gres=gpu:1
+#SBATCH --partition=gpu_a100_il
 
 echo "Job started ..."
 

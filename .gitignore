@@ -3,7 +3,7 @@ __pycache__/
 *.swp
 .env
 .pylintrc
-minGPT-master/out/
-minGPT-master/cache/
-minGPT-master/logs/
-*.pt
+
+my_gpt2/source/datasets
+my_gpt2/source/hellaswag
+my_gpt2/results/pretraining
