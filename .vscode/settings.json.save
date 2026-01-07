@@ -1,0 +1,20 @@
+{
+  "files.watcherExclude": {
+    "**/logs/**": true,
+    "**/checkpoints/**": true,
+    "**/runs/**": true,
+    "**/wandb/**": true,
+    "**/.git/**": true,
+    "**/.venv/**": true,
+    "**/data/**": true
+  },
+  "search.exclude": {
+    "**/logs/**": true,
+    "**/checkpoints/**": true,
+    "**/runs/**": true,
+    "**/wandb/**": true,
+    "**/.git/**": true,
+    "**/.venv/**": true,
+    "**/data/**": true
+  }
+}
