@@ -33,6 +33,8 @@ class CausalSelfAttention(nn.Module):
         self.c_attn = nn.Linear(config.n_embd, 3 * config.n_embd)
         # output c_projection
         self.c_proj = nn.Linear(config.n_embd, config.n_embd)
+        # stabilisiert die Residual-Branch-Skalen über viele Layer
+        self.c_proj.NANOGPT_SCALE_INIT = 1 
         # regularization
         self.n_head = config.n_head
         self.n_embd = config.n_embd
@@ -75,6 +77,7 @@ class MLP(nn.Module):
         self.gelu = nn.GELU(approximate='tanh')
         # Fully connected layer projecting back to the original embedding dimension
         self.c_proj = nn.Linear(4 * config.n_embd, config.n_embd)
+        self.c_proj.NANOGPT_SCALE_INIT = 1
     
     def forward(self, x):
         x = self.c_fc(x)
@@ -139,7 +142,7 @@ class GPT(nn.Module):
         elif isinstance(module, nn.Embedding):
             nn.init.normal_(module.weight, mean=0.0, std=0.02)
 
-    def forward(self, idx, targets=None):
+    def forward(self, idx, targets=None, loss_mask = None):
         B, T = idx.size()
         assert T <= self.config.block_size, "Cannot forward, model block size is exhausted."
         # Token and Position embeddings
@@ -157,7 +160,19 @@ class GPT(nn.Module):
         # Calculate loss if targets are provided
         loss = None
         if targets is not None:
-            loss = F.cross_entropy(logits.view(-1, logits.size(-1)), targets.view(-1))
+            # token level loss
+            per_tok = F.cross_entropy(
+                logits.view(-1, logits.size(-1)),
+                targets.view(-1),
+                reduction="none",
+                ignore_index=-1
+            ).view_as(targets)
+            if loss_mask is None:
+                denom = (targets != -1).sum().clamp(min=1)
+                loss = per_tok.sum() / denom
+            else:
+                denom = loss_mask.sum().clamp(min=1)
+                loss = (per_tok * loss_mask).sum() / denom
         return logits, loss
 
     """
