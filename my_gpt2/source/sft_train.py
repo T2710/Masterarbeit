@@ -139,11 +139,11 @@ def main():
     ap = argparse.ArgumentParser()
     ap.add_argument("--data_dir", type=str, default="my_gpt2/source/datasets/ultrachat_sft_examples")
     ap.add_argument("--prefix", type=str, default="ultrachat_all")
-    ap.add_argument("--pretrain_ckpt", type=str, default="my_gpt2/results/pretraining/model_30000_fineweb10B.pt")
+    ap.add_argument("--pretrain_ckpt", type=str, default="my_gpt2/results/pretraining/log_pretraining_gpt2/gpt2_model_70000.pt")
     ap.add_argument("--out_dir", type=str, default="my_gpt2/results/sft_ultrachat")
 
     # how many examples to use (this is what you wanted!)
-    ap.add_argument("--max_train_examples", type=int, default=50_000, help="-1 = use all available")
+    ap.add_argument("--max_train_examples", type=int, default=150_000, help="-1 = use all available")
     ap.add_argument("--max_val_examples", type=int, default=2_000, help="-1 = use all available")
     ap.add_argument("--val_fraction_shards", type=float, default=0.02, help="fraction of shards for val split")
 
@@ -152,13 +152,13 @@ def main():
     ap.add_argument("--target_examples_per_step", type=int, default=32)
 
     # training horizon
-    ap.add_argument("--max_steps", type=int, default=4000, help="SFT should be short (2k-8k often enough)")
-    ap.add_argument("--eval_every", type=int, default=200)
-    ap.add_argument("--eval_steps", type=int, default=100)
-    ap.add_argument("--save_every", type=int, default=500)
+    ap.add_argument("--max_steps", type=int, default=8000, help="SFT should be short (2k-8k often enough)")
+    ap.add_argument("--eval_every", type=int, default=400)
+    ap.add_argument("--eval_steps", type=int, default=50)
+    ap.add_argument("--save_every", type=int, default=1000)
 
     # optimization
-    ap.add_argument("--lr", type=float, default=1e-5)
+    ap.add_argument("--lr", type=float, default=2e-5)
     ap.add_argument("--weight_decay", type=float, default=0.0)
     ap.add_argument("--grad_clip", type=float, default=1.0)
     ap.add_argument("--dtype", type=str, default="bfloat16", choices=["float32", "bfloat16"])

@@ -23,7 +23,17 @@ mkdir -p logs
 python -c "import torch; print('CUDA available:', torch.cuda.is_available()); \
 print('Device:', torch.cuda.get_device_name(0) if torch.cuda.is_available() else 'CPU')"
 
-python -m my_gpt2.source.sft_train --max_train_examples -1 --max_val_examples 2000 --max_steps 38148
+python -m my_gpt2.source.sft_train \
+  --max_train_examples 150000 \
+  --max_val_examples 2000 \
+  --device_batch_size 4 \
+  --target_examples_per_step 32 \
+  --max_steps 8000 \
+  --lr 2e-5 \
+  --eval_every 400 \
+  --eval_steps 50 \
+  --save_every 1000
+
 
 echo "Job completed."
 

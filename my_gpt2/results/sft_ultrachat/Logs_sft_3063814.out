@@ -1,0 +1,152 @@
+Job started ...
+CUDA available: True
+Device: NVIDIA A100 80GB PCIe
+Device: cuda
+Found shards: 21 total | 20 train | 1 val
+Loaded pretrain ckpt: my_gpt2/results/pretraining/log_pretraining_gpt2/gpt2_model_70000.pt
+num decayed parameter tensors: 50, with 124,354,560 parameters
+num non-decayed parameter tensors: 98, with 121,344 parameters
+using fused AdamW: True
+device_batch_size: 4
+target_examples_per_step: 32
+=> grad_accum_steps: 8
+⚠️ reducing max_steps from 8000 to 4687 (because max_train_examples=150000)
+[eval] step 00000 | val_loss 2.2400
+✅ saved best.pt
+step 00000/4687 | train_loss 2.2242 | lr 5.00e-05 | sup_toks 21,767 | dt 6.49s
+step 00050/4687 | train_loss 1.9752 | lr 4.95e-05 | sup_toks 23,074 | dt 13.67s
+step 00100/4687 | train_loss 1.9817 | lr 4.89e-05 | sup_toks 21,598 | dt 13.76s
+step 00150/4687 | train_loss 1.8592 | lr 4.84e-05 | sup_toks 25,306 | dt 13.80s
+step 00200/4687 | train_loss 1.9059 | lr 4.79e-05 | sup_toks 22,781 | dt 13.88s
+step 00250/4687 | train_loss 1.8349 | lr 4.73e-05 | sup_toks 25,091 | dt 16.01s
+step 00300/4687 | train_loss 1.7881 | lr 4.68e-05 | sup_toks 20,583 | dt 13.95s
+step 00350/4687 | train_loss 1.7797 | lr 4.63e-05 | sup_toks 25,931 | dt 13.98s
+[eval] step 00400 | val_loss 1.7906
+✅ saved best.pt
+step 00400/4687 | train_loss 1.8393 | lr 4.57e-05 | sup_toks 21,029 | dt 16.91s
+step 00450/4687 | train_loss 1.8935 | lr 4.52e-05 | sup_toks 23,390 | dt 14.02s
+step 00500/4687 | train_loss 1.8689 | lr 4.47e-05 | sup_toks 24,761 | dt 14.06s
+step 00550/4687 | train_loss 1.7900 | lr 4.41e-05 | sup_toks 21,688 | dt 14.09s
+step 00600/4687 | train_loss 1.8499 | lr 4.36e-05 | sup_toks 21,849 | dt 15.91s
+step 00650/4687 | train_loss 1.8664 | lr 4.31e-05 | sup_toks 23,664 | dt 14.06s
+step 00700/4687 | train_loss 1.7626 | lr 4.25e-05 | sup_toks 21,449 | dt 14.10s
+step 00750/4687 | train_loss 1.8359 | lr 4.20e-05 | sup_toks 20,927 | dt 14.11s
+[eval] step 00800 | val_loss 1.7556
+✅ saved best.pt
+step 00800/4687 | train_loss 1.7186 | lr 4.15e-05 | sup_toks 23,324 | dt 17.29s
+step 00850/4687 | train_loss 1.9045 | lr 4.09e-05 | sup_toks 23,507 | dt 14.12s
+step 00900/4687 | train_loss 1.7622 | lr 4.04e-05 | sup_toks 22,211 | dt 15.82s
+step 00950/4687 | train_loss 1.6383 | lr 3.99e-05 | sup_toks 23,651 | dt 14.11s
+saved checkpoint
+step 01000/4687 | train_loss 1.7383 | lr 3.93e-05 | sup_toks 23,712 | dt 14.63s
+step 01050/4687 | train_loss 1.7336 | lr 3.88e-05 | sup_toks 22,195 | dt 14.11s
+step 01100/4687 | train_loss 1.8776 | lr 3.83e-05 | sup_toks 22,492 | dt 14.08s
+step 01150/4687 | train_loss 1.8134 | lr 3.77e-05 | sup_toks 20,403 | dt 14.13s
+[eval] step 01200 | val_loss 1.7370
+✅ saved best.pt
+step 01200/4687 | train_loss 1.7191 | lr 3.72e-05 | sup_toks 21,075 | dt 19.03s
+step 01250/4687 | train_loss 1.8430 | lr 3.67e-05 | sup_toks 22,687 | dt 14.10s
+step 01300/4687 | train_loss 1.7667 | lr 3.61e-05 | sup_toks 21,747 | dt 14.08s
+step 01350/4687 | train_loss 1.7576 | lr 3.56e-05 | sup_toks 22,378 | dt 14.08s
+step 01400/4687 | train_loss 1.6848 | lr 3.51e-05 | sup_toks 20,878 | dt 14.10s
+step 01450/4687 | train_loss 1.7322 | lr 3.45e-05 | sup_toks 23,177 | dt 14.08s
+step 01500/4687 | train_loss 1.7758 | lr 3.40e-05 | sup_toks 23,423 | dt 15.88s
+step 01550/4687 | train_loss 1.7324 | lr 3.35e-05 | sup_toks 19,948 | dt 14.08s
+[eval] step 01600 | val_loss 1.7207
+✅ saved best.pt
+step 01600/4687 | train_loss 1.6229 | lr 3.29e-05 | sup_toks 23,189 | dt 16.99s
+step 01650/4687 | train_loss 1.7706 | lr 3.24e-05 | sup_toks 23,379 | dt 14.09s
+step 01700/4687 | train_loss 1.6990 | lr 3.19e-05 | sup_toks 25,919 | dt 14.06s
+step 01750/4687 | train_loss 1.8328 | lr 3.13e-05 | sup_toks 23,958 | dt 14.09s
+step 01800/4687 | train_loss 1.7954 | lr 3.08e-05 | sup_toks 25,076 | dt 14.11s
+step 01850/4687 | train_loss 1.7115 | lr 3.03e-05 | sup_toks 21,655 | dt 16.25s
+step 01900/4687 | train_loss 1.8026 | lr 2.97e-05 | sup_toks 23,359 | dt 14.09s
+step 01950/4687 | train_loss 1.7025 | lr 2.92e-05 | sup_toks 21,752 | dt 14.10s
+[eval] step 02000 | val_loss 1.7111
+✅ saved best.pt
+saved checkpoint
+step 02000/4687 | train_loss 1.5710 | lr 2.87e-05 | sup_toks 22,610 | dt 17.53s
+step 02050/4687 | train_loss 1.7627 | lr 2.81e-05 | sup_toks 23,243 | dt 14.07s
+step 02100/4687 | train_loss 1.6622 | lr 2.76e-05 | sup_toks 22,170 | dt 14.08s
+step 02150/4687 | train_loss 1.6538 | lr 2.71e-05 | sup_toks 23,890 | dt 15.87s
+step 02200/4687 | train_loss 1.7984 | lr 2.65e-05 | sup_toks 21,984 | dt 14.08s
+step 02250/4687 | train_loss 1.6606 | lr 2.60e-05 | sup_toks 23,698 | dt 14.08s
+step 02300/4687 | train_loss 1.6818 | lr 2.55e-05 | sup_toks 21,681 | dt 14.07s
+step 02350/4687 | train_loss 1.7648 | lr 2.49e-05 | sup_toks 23,680 | dt 14.10s
+[eval] step 02400 | val_loss 1.7010
+✅ saved best.pt
+step 02400/4687 | train_loss 1.6644 | lr 2.44e-05 | sup_toks 21,603 | dt 17.35s
+step 02450/4687 | train_loss 1.6460 | lr 2.39e-05 | sup_toks 25,177 | dt 15.80s
+step 02500/4687 | train_loss 1.6787 | lr 2.33e-05 | sup_toks 24,284 | dt 14.05s
+step 02550/4687 | train_loss 1.6987 | lr 2.28e-05 | sup_toks 20,874 | dt 14.06s
+step 02600/4687 | train_loss 1.6169 | lr 2.23e-05 | sup_toks 22,284 | dt 14.09s
+step 02650/4687 | train_loss 1.5221 | lr 2.17e-05 | sup_toks 20,618 | dt 14.08s
+step 02700/4687 | train_loss 1.6399 | lr 2.12e-05 | sup_toks 23,238 | dt 14.10s
+step 02750/4687 | train_loss 1.6933 | lr 2.07e-05 | sup_toks 23,005 | dt 15.89s
+[eval] step 02800 | val_loss 1.6912
+✅ saved best.pt
+step 02800/4687 | train_loss 1.6732 | lr 2.01e-05 | sup_toks 23,471 | dt 16.98s
+step 02850/4687 | train_loss 1.6259 | lr 1.96e-05 | sup_toks 24,705 | dt 14.09s
+step 02900/4687 | train_loss 1.7995 | lr 1.91e-05 | sup_toks 24,589 | dt 14.09s
+step 02950/4687 | train_loss 1.6361 | lr 1.85e-05 | sup_toks 21,627 | dt 14.07s
+saved checkpoint
+step 03000/4687 | train_loss 1.6741 | lr 1.80e-05 | sup_toks 24,108 | dt 14.64s
+step 03050/4687 | train_loss 1.7133 | lr 1.75e-05 | sup_toks 21,371 | dt 14.11s
+step 03100/4687 | train_loss 1.6379 | lr 1.69e-05 | sup_toks 22,103 | dt 16.20s
+step 03150/4687 | train_loss 1.7628 | lr 1.64e-05 | sup_toks 22,807 | dt 14.09s
+[eval] step 03200 | val_loss 1.6853
+✅ saved best.pt
+step 03200/4687 | train_loss 1.6702 | lr 1.59e-05 | sup_toks 21,574 | dt 17.00s
+step 03250/4687 | train_loss 1.6039 | lr 1.53e-05 | sup_toks 21,849 | dt 14.08s
+step 03300/4687 | train_loss 1.7670 | lr 1.48e-05 | sup_toks 20,978 | dt 14.07s
+step 03350/4687 | train_loss 1.6578 | lr 1.43e-05 | sup_toks 21,004 | dt 14.09s
+step 03400/4687 | train_loss 1.7307 | lr 1.37e-05 | sup_toks 23,486 | dt 15.82s
+step 03450/4687 | train_loss 1.5035 | lr 1.32e-05 | sup_toks 22,451 | dt 14.10s
+step 03500/4687 | train_loss 1.6965 | lr 1.27e-05 | sup_toks 23,115 | dt 14.13s
+step 03550/4687 | train_loss 1.6421 | lr 1.21e-05 | sup_toks 21,697 | dt 14.08s
+[eval] step 03600 | val_loss 1.6797
+✅ saved best.pt
+step 03600/4687 | train_loss 1.7337 | lr 1.16e-05 | sup_toks 21,527 | dt 17.31s
+step 03650/4687 | train_loss 1.6885 | lr 1.11e-05 | sup_toks 22,442 | dt 14.07s
+step 03700/4687 | train_loss 1.6535 | lr 1.05e-05 | sup_toks 23,409 | dt 15.84s
+step 03750/4687 | train_loss 1.6153 | lr 1.00e-05 | sup_toks 21,132 | dt 14.06s
+step 03800/4687 | train_loss 1.6148 | lr 9.46e-06 | sup_toks 21,834 | dt 14.07s
+step 03850/4687 | train_loss 1.7602 | lr 8.93e-06 | sup_toks 22,006 | dt 14.11s
+step 03900/4687 | train_loss 1.7126 | lr 8.40e-06 | sup_toks 22,207 | dt 14.09s
+step 03950/4687 | train_loss 1.6610 | lr 7.86e-06 | sup_toks 26,144 | dt 14.09s
+[eval] step 04000 | val_loss 1.6742
+✅ saved best.pt
+saved checkpoint
+step 04000/4687 | train_loss 1.6769 | lr 7.33e-06 | sup_toks 25,451 | dt 19.54s
+step 04050/4687 | train_loss 1.5842 | lr 6.80e-06 | sup_toks 22,521 | dt 14.06s
+step 04100/4687 | train_loss 1.5898 | lr 6.26e-06 | sup_toks 21,021 | dt 14.09s
+step 04150/4687 | train_loss 1.6228 | lr 5.73e-06 | sup_toks 20,176 | dt 14.07s
+step 04200/4687 | train_loss 1.7335 | lr 5.20e-06 | sup_toks 22,724 | dt 14.08s
+step 04250/4687 | train_loss 1.5263 | lr 4.66e-06 | sup_toks 21,903 | dt 14.10s
+step 04300/4687 | train_loss 1.6895 | lr 4.13e-06 | sup_toks 24,058 | dt 14.12s
+step 04350/4687 | train_loss 1.6740 | lr 3.60e-06 | sup_toks 23,380 | dt 15.86s
+[eval] step 04400 | val_loss 1.6698
+✅ saved best.pt
+step 04400/4687 | train_loss 1.7415 | lr 3.06e-06 | sup_toks 24,256 | dt 16.97s
+step 04450/4687 | train_loss 1.6567 | lr 2.53e-06 | sup_toks 22,808 | dt 14.07s
+step 04500/4687 | train_loss 1.6684 | lr 1.99e-06 | sup_toks 22,818 | dt 14.10s
+step 04550/4687 | train_loss 1.6226 | lr 1.46e-06 | sup_toks 23,757 | dt 14.09s
+step 04600/4687 | train_loss 1.6709 | lr 9.28e-07 | sup_toks 23,899 | dt 14.11s
+step 04650/4687 | train_loss 1.7514 | lr 3.95e-07 | sup_toks 20,722 | dt 16.32s
+saved final.pt
+Job completed.
+
+============================= JOB FEEDBACK =============================
+
+NodeName=uc2n911
+Job ID: 3063814
+Cluster: uc3
+User/Group: ul_raf24/ul_student
+State: COMPLETED (exit code 0)
+Nodes: 1
+Cores per node: 2
+CPU Utilized: 00:23:13
+CPU Efficiency: 48.91% of 00:47:28 core-walltime
+Job Wall-clock time: 00:23:44
+Memory Utilized: 2.15 GB
+Memory Efficiency: 1.70% of 127.00 GB (127.00 GB/node)
