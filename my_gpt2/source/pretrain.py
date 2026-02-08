@@ -189,7 +189,7 @@ def main():
 
     """
     Use Batch Size = 0.5 M because it matches the other Hyperparameters from the GPT paper
-    Symiulate this by accumulating gradients over multiple smaller batches if necessary because of GPU memory limits
+    Simiulate this by accumulating gradients over multiple smaller batches if necessary because of GPU memory limits
     16 * 1024 = 16384 tokens per step -> 524288 / 16384 = 32 gradient accumulation steps to reach total batch size
     Split the total batch size into smaller micro-batches bevor Backpropagation by accumulating gradients
     """

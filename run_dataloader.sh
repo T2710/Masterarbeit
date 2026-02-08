@@ -1,7 +1,7 @@
 #!/bin/bash
 #SBATCH --job-name=RunSimulation
-#SBATCH --output=logs/Logs%j.out
-#SBATCH --error=logs/Logs%j.err
+#SBATCH --output=logs/Logs_dataloader_%j.out
+#SBATCH --error=logs/Logs_dataloader_%j.err
 #SBATCH --time=04:00:00
 #SBATCH --ntasks=1
 #SBATCH --cpus-per-task=2
@@ -22,9 +22,8 @@ mkdir -p logs
 python -c "import torch; print('CUDA available:', torch.cuda.is_available()); \
 print('Device:', torch.cuda.get_device_name(0) if torch.cuda.is_available() else 'CPU')"
 
-# python -m my_gpt2.source.dataloader
-python -m my_gpt2.source.ultrachat --out_dir my_gpt2/source/datasets/ultrachat_sft_examples --num_examples -1 --shard_size_examples 10000
-
+python -m my_gpt2.source.dataloader --dataset edu_fineweb100B --max_tokens 30000000000
+# python -m my_gpt2.source.ultrachat --out_dir my_gpt2/source/datasets/ultrachat_sft_examples --num_examples -1 --shard_size_examples 10000
 
 echo "Job completed."
 

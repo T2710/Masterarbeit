@@ -1,8 +1,8 @@
 #!/bin/bash
 #SBATCH --job-name=RunSimulation
-#SBATCH --output=logs/Logs_reasoning_%j.out
-#SBATCH --error=logs/Logs_reasoning_%j.err
-#SBATCH --time=04:00:00
+#SBATCH --output=logs/logs_reasoning_true_%j.out
+#SBATCH --error=logs/logs_reasoning_true_%j.err
+#SBATCH --time=01:00:00
 #SBATCH --ntasks=1
 #SBATCH --cpus-per-task=2
 #SBATCH --mem=127G
@@ -23,25 +23,27 @@ mkdir -p logs
 python -c "import torch; print('CUDA available:', torch.cuda.is_available()); \
 print('Device:', torch.cuda.get_device_name(0) if torch.cuda.is_available() else 'CPU')"
 
-# No Reasoning
-python -m my_gpt2.source.sft_train \
-  --data_dir my_gpt2/source/datasets/gsm8k_sft_examples/gsm8k_direct \
-  --prefix gsm8k_direct \
-  --pretrain_ckpt my_gpt2/results/gsm8k_direct/final.pt \
-  --out_dir my_gpt2/results/sft_gsm8k_direct \
-  --max_steps 2000 \
-  --eval_every 200 \
-  --save_every 500
+# # No Reasoning
+# python -m my_gpt2.source.sft_train \
+#   --data_dir my_gpt2/source/datasets/gsm8k_sft_examples/gsm8k_direct \
+#   --prefix gsm8k_direct \
+#   --pretrain_ckpt my_gpt2/results/sft_ultrachat/best.pt \
+#   --out_dir my_gpt2/results/sft_gsm8k_direct \
+#   --max_steps 1170 \
+#   --eval_every 200 \
+#   --max_train_examples -1 \
+#   --save_every 500
 
 # With Reasoning (COT)
-# python -m my_gpt2.source.sft_train \
-#   --data_dir my_gpt2/source/datasets/gsm8k_sft_examples/gsm8k_cot \
-#   --prefix gsm8k_cot \
-#   --pretrain_ckpt my_gpt2/results/gsm8k_cot/final.pt \
-#   --out_dir my_gpt2/results/sft_gsm8k_cot \
-#   --max_steps 2000 \
-#   --eval_every 200 \
-#   --save_every 500
+python -m my_gpt2.source.sft_train \
+  --data_dir my_gpt2/source/datasets/gsm8k_sft_examples/gsm8k_cot \
+  --prefix gsm8k_cot \
+  --pretrain_ckpt my_gpt2/results/sft_ultrachat/best.pt \
+  --out_dir my_gpt2/results/sft_gsm8k_cot \
+  --max_steps 1170 \
+  --eval_every 200 \
+  --max_train_examples -1 \
+  --save_every 500
 
 
 echo "Job completed."

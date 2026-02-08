@@ -155,7 +155,7 @@ def extract_assistant_text(full_text: str) -> str:
 
 def main():
     ap = argparse.ArgumentParser()
-    ap.add_argument("--ckpt", type=str, required=False, default="my_gpt2/results/sft_ultrachat/best.pt")
+    ap.add_argument("--ckpt", type=str, required=False, default="my_gpt2/results/pretraining/log_pretraining_gpt2-medium/gpt2-medium_model_79999.pt")
     ap.add_argument("--max_new_tokens", type=int, default=220)
     ap.add_argument("--temperature", type=float, default=0.8)
     ap.add_argument("--top_k", type=int, default=50)
