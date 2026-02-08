@@ -1,0 +1,343 @@
+Job started ...
+CUDA available: True
+Device: NVIDIA A100 80GB PCIe
+Eval without Reasoning:
+--------------------------------------------------------------------------------
+GT:   14
+PRED: 2
+PROMPT (tail):
+<|endoftext|>You are a helpful assistant.
+User: Donny went to the gas station to gas up his tank. He knows his truck holds 150 liters of fuel. His truck already contained 38 liters. How much change will he get from $350 if each liter of fuel costs $3?
+Assistant: 
+GEN (tail):
+<|endoftext|>You are a helpful assistant.
+User: Donny went to the gas station to gas up his tank. He knows his truck holds 150 liters of fuel. His truck already contained 38 liters. How much change will he get from $350 if each liter of fuel costs $3?
+Assistant: Final Answer: 2
+<|endoftext|>
+--------------------------------------------------------------------------------
+GT:   130
+PRED: 160
+PROMPT (tail):
+<|endoftext|>You are a helpful assistant.
+User: Aron spends 30 minutes/day three times a week vacuuming and 20 minutes/day 2 days a week dusting. How much time does he spend cleaning total each week?
+Assistant: 
+GEN (tail):
+<|endoftext|>You are a helpful assistant.
+User: Aron spends 30 minutes/day three times a week vacuuming and 20 minutes/day 2 days a week dusting. How much time does he spend cleaning total each week?
+Assistant: Final Answer: 160
+<|endoftext|>
+--------------------------------------------------------------------------------
+GT:   60000
+PRED: 10000
+PROMPT (tail):
+<|endoftext|>You are a helpful assistant.
+User: The cost of building a certain house in an area is 100,000 more than the construction cost of each of the houses in the area.  But it sells for 1.5 times as much as the other houses, which sell at $320,000 each. How much more profit is made by spending the extra money to build?
+Assistant: 
+GEN (tail):
+<|endoftext|>You are a helpful assistant.
+User: The cost of building a certain house in an area is 100,000 more than the construction cost of each of the houses in the area.  But it sells for 1.5 times as much as the other houses, which sell at $320,000 each. How much more profit is made by spending the extra money to build?
+Assistant: Final Answer: 10,000
+<|endoftext|>
+--------------------------------------------------------------------------------
+GT:   750
+PRED: 50
+PROMPT (tail):
+<|endoftext|>You are a helpful assistant.
+User: There are 2,000 kids in camp. If half of the kids are going to soccer camp, and 1/4 of the kids going to soccer camp are going to soccer camp in the morning, how many kids are going to soccer camp in the afternoon?
+Assistant: 
+GEN (tail):
+<|endoftext|>You are a helpful assistant.
+User: There are 2,000 kids in camp. If half of the kids are going to soccer camp, and 1/4 of the kids going to soccer camp are going to soccer camp in the morning, how many kids are going to soccer camp in the afternoon?
+Assistant: Final Answer: 50
+<|endoftext|>
+--------------------------------------------------------------------------------
+GT:   90
+PRED: 6
+PROMPT (tail):
+<|endoftext|>You are a helpful assistant.
+User: Herman likes to feed the birds in December, January and February.  He feeds them 1/2 cup in the morning and 1/2 cup in the afternoon.  How many cups of food will he need for all three months?
+Assistant: 
+GEN (tail):
+<|endoftext|>You are a helpful assistant.
+User: Herman likes to feed the birds in December, January and February.  He feeds them 1/2 cup in the morning and 1/2 cup in the afternoon.  How many cups of food will he need for all three months?
+Assistant: Final Answer: 6
+<|endoftext|>
+--------------------------------------------------------------------------------
+GT:   30
+PRED: 10
+PROMPT (tail):
+<|endoftext|>You are a helpful assistant.
+User: Darlene's car gets 20 miles/gallon. Martha's car gets half as many miles per gallon as Darlene’s car. How many gallons does Martha’s car require to make a 300-mile trip?
+Assistant: 
+GEN (tail):
+<|endoftext|>You are a helpful assistant.
+User: Darlene's car gets 20 miles/gallon. Martha's car gets half as many miles per gallon as Darlene’s car. How many gallons does Martha’s car require to make a 300-mile trip?
+Assistant: Final Answer: 10
+<|endoftext|>
+--------------------------------------------------------------------------------
+GT:   121
+PRED: 66
+PROMPT (tail):
+<|endoftext|>You are a helpful assistant.
+User: Preston has a sandwich shop. He charges $5 for each sandwich. He also charges $20 for a delivery fee. Abra Company orders 18 sandwiches from Preston and also tips him 10%. How much total, in dollars, did Preston receive?
+Assistant: 
+GEN (tail):
+<|endoftext|>You are a helpful assistant.
+User: Preston has a sandwich shop. He charges $5 for each sandwich. He also charges $20 for a delivery fee. Abra Company orders 18 sandwiches from Preston and also tips him 10%. How much total, in dollars, did Preston receive?
+Assistant: Final Answer: 66
+<|endoftext|>
+--------------------------------------------------------------------------------
+GT:   64
+PRED: 6
+PROMPT (tail):
+<|endoftext|>You are a helpful assistant.
+User: Four days ago, Carlos bought a bag of gummy worms. Every day he ate half of the remaining gummy worms. After eating half of the remainder on the fourth day, he now has 4 gummy worms left. How many gummy worms were in the bag when Carlos bought it?
+Assistant: 
+GEN (tail):
+<|endoftext|>You are a helpful assistant.
+User: Four days ago, Carlos bought a bag of gummy worms. Every day he ate half of the remaining gummy worms. After eating half of the remainder on the fourth day, he now has 4 gummy worms left. How many gummy worms were in the bag when Carlos bought it?
+Assistant: Final Answer: 6
+<|endoftext|>
+--------------------------------------------------------------------------------
+GT:   50
+PRED: 5
+PROMPT (tail):
+<|endoftext|>You are a helpful assistant.
+User: John buys 5 notebooks that have 40 pages each.  He uses 4 pages per day.  How many days do the notebooks last?
+Assistant: 
+GEN (tail):
+<|endoftext|>You are a helpful assistant.
+User: John buys 5 notebooks that have 40 pages each.  He uses 4 pages per day.  How many days do the notebooks last?
+Assistant: Final Answer: 5
+<|endoftext|>
+--------------------------------------------------------------------------------
+GT:   240
+PRED: 200
+PROMPT (tail):
+<|endoftext|>You are a helpful assistant.
+User: Marlene wants to buy half a dozen of shirts to avail of the sale. The regular price of a shirt is $50 and is now on sale at a 20% discount. How much will Marlene pay for the shirts?
+Assistant: 
+GEN (tail):
+<|endoftext|>You are a helpful assistant.
+User: Marlene wants to buy half a dozen of shirts to avail of the sale. The regular price of a shirt is $50 and is now on sale at a 20% discount. How much will Marlene pay for the shirts?
+Assistant: Final Answer: 200
+<|endoftext|>
+====================================
+ckpt=my_gpt2/results/sft_gsm8k_direct_v2/best.pt
+dataset_dir=my_gpt2/source/datasets/gsm8k_sft_examples/gsm8k_train/gsm8k_direct prefix=gsm8k_direct
+evaluated=6726 correct=455 acc=0.0676
+====================================
+Eval with Reasoning:
+--------------------------------------------------------------------------------
+GT:   14
+PRED: None
+PROMPT (tail):
+<|endoftext|>You are a helpful assistant.
+User: Donny went to the gas station to gas up his tank. He knows his truck holds 150 liters of fuel. His truck already contained 38 liters. How much change will he get from $350 if each liter of fuel costs $3?
+Assistant: 
+GEN (tail):
+<|endoftext|>You are a helpful assistant.
+User: Donny went to the gas station to gas up his tank. He knows his truck holds 150 liters of fuel. His truck already contained 38 liters. How much change will he get from $350 if each liter of fuel costs $3?
+Assistant: Donny's truck has a total of 150 liters * 38 liters = <<150*38=300>>300 liters.
+Donny's truck has a total of 300 liters * 38 liters = <<300*38=600>>600 liters.
+Donny's truck has a total of 600 liters * 3 liters = <<600*3=1200>>1200 liters.
+Donny's truck has a total of 1200 liters * 12 liters = <<1200*12=1250>>1250 liters.
+Donny's truck has a total of 1200 liters * 12 liters = <<1200*1250=1250>>1250 liters.
+Donny's truck has a total of 1250 liters * 12 liters = <<1250*1250=1250>>1250 liters.
+Donny's truck has a total of 1250 liters * 12 liters = <<1250*1250=1250>>1250 liters.
+Donny's truck has a total of 1250 liters * 12 liters = <<1250*1250=1250>>1250 liters.
+Donny's truck has a total of 1250 liters
+--------------------------------------------------------------------------------
+GT:   130
+PRED: 3
+PROMPT (tail):
+<|endoftext|>You are a helpful assistant.
+User: Aron spends 30 minutes/day three times a week vacuuming and 20 minutes/day 2 days a week dusting. How much time does he spend cleaning total each week?
+Assistant: 
+GEN (tail):
+<|endoftext|>You are a helpful assistant.
+User: Aron spends 30 minutes/day three times a week vacuuming and 20 minutes/day 2 days a week dusting. How much time does he spend cleaning total each week?
+Assistant: Aron spends 30 minutes/day 3 times a week vacuuming and 20 minutes/day 2 days a week dusting.
+He spends 30 minutes/day 3 times a week vacuuming and 20 minutes/day 2 days a week dusting.
+He spends 30 minutes/day 3 times a week vacuuming and 20 minutes/day 2 days a week dusting.
+He spends 30 minutes/day 3 times a week vacuuming and 20 minutes/day 2 days a week dusting.
+He spends 30 minutes/day 3 times a week vacuuming and 20 minutes/day 2 days a week dusting.
+Final Answer: 3
+<|endoftext|>
+--------------------------------------------------------------------------------
+GT:   50
+PRED: 200
+PROMPT (tail):
+<|endoftext|>You are a helpful assistant.
+User: Tina buys a loaf of bread for $50, 2oz of ham for $150, and a cake for $200. What percent of the cost is the ham and bread?
+Assistant: 
+GEN (tail):
+<|endoftext|>You are a helpful assistant.
+User: Tina buys a loaf of bread for $50, 2oz of ham for $150, and a cake for $200. What percent of the cost is the ham and bread?
+Assistant: Tina buys 2oz of ham for $150, so she buys 2*$150 = $<<2*150=300>>300
+2oz of ham is $300 - $300 = $<<300-300=300>>300
+2oz of bread is $200 - $200 = $<<200-200=200>>200
+The cost of the ham and bread is $300 - $200 = $<<300-200=200>>200
+Final Answer: 200
+<|endoftext|>
+--------------------------------------------------------------------------------
+GT:   60000
+PRED: None
+PROMPT (tail):
+<|endoftext|>You are a helpful assistant.
+User: The cost of building a certain house in an area is 100,000 more than the construction cost of each of the houses in the area.  But it sells for 1.5 times as much as the other houses, which sell at $320,000 each. How much more profit is made by spending the extra money to build?
+Assistant: 
+GEN (tail):
+<|endoftext|>You are a helpful assistant.
+User: The cost of building a certain house in an area is 100,000 more than the construction cost of each of the houses in the area.  But it sells for 1.5 times as much as the other houses, which sell at $320,000 each. How much more profit is made by spending the extra money to build?
+Assistant: The cost of building the houses in the area is 100,000 * $320,000 = $<<100000*320000=320000>>320,000
+The cost of building the houses in the area is $320,000 / 1.5 = $<<320000/1.5=30>>30,000
+The cost of building the houses in the area is $320,000 / 1.5 = $<<320000/1.5=30>>30,000
+The cost of building the houses in the area is $30,000 / 1.5 = $<<30000/1.5=30>>30,000
+The cost of building the houses in the area is $30,000 / 1.5 = $<<30000/1.5=30>>30,000
+The cost of building the houses in the area is $30,000 / 1.5 = $<<30000/1.5=30>>30,000
+The cost of building the houses in the area is $30,000 / 1.5 = $<<30000/1.5=30>>30,000
+The cost of building the houses in the area is $30,000 / 1.5
+--------------------------------------------------------------------------------
+GT:   750
+PRED: 1
+PROMPT (tail):
+<|endoftext|>You are a helpful assistant.
+User: There are 2,000 kids in camp. If half of the kids are going to soccer camp, and 1/4 of the kids going to soccer camp are going to soccer camp in the morning, how many kids are going to soccer camp in the afternoon?
+Assistant: 
+GEN (tail):
+<|endoftext|>You are a helpful assistant.
+User: There are 2,000 kids in camp. If half of the kids are going to soccer camp, and 1/4 of the kids going to soccer camp are going to soccer camp in the morning, how many kids are going to soccer camp in the afternoon?
+Assistant: If half of the kids are going to soccer camp, then half of the kids are going to soccer camp in the morning, so half of the kids are going to soccer camp in the afternoon.
+If 1/4 of the kids are going to soccer camp, then 1/4 of the kids are going to soccer camp in the afternoon, so 1/4 of the kids are going to soccer camp in the afternoon.
+Final Answer: 1
+<|endoftext|>
+--------------------------------------------------------------------------------
+GT:   90
+PRED: None
+PROMPT (tail):
+<|endoftext|>You are a helpful assistant.
+User: Herman likes to feed the birds in December, January and February.  He feeds them 1/2 cup in the morning and 1/2 cup in the afternoon.  How many cups of food will he need for all three months?
+Assistant: 
+GEN (tail):
+ a helpful assistant.
+User: Herman likes to feed the birds in December, January and February.  He feeds them 1/2 cup in the morning and 1/2 cup in the afternoon.  How many cups of food will he need for all three months?
+Assistant: He feeds 1/2 cup in the morning and 1/2 cup in the afternoon.
+He feeds 1/2 cup in the morning and 1/2 cup in the afternoon.
+He feeds 1 cup in the morning and 1 cup in the afternoon.
+He feeds 1 cup in the morning and 1 cup in the afternoon.
+He feeds 1 cup in the morning and 1 cup in the afternoon.
+He feeds 1 cup in the morning and 1 cup in the afternoon.
+He feeds 1 cup in the morning and 1 cup in the afternoon.
+He feeds 1 cup in the morning and 1 cup in the afternoon.
+He feeds 1 cup in the morning and 1 cup in the afternoon.
+He feeds 1 cup in the morning and 1 cup in the afternoon.
+He feeds 1 cup in the morning and 1 cup in the afternoon.
+He feeds 1 cup in the morning and 1 cup in the afternoon.
+He feeds 1 cup in the morning and 1 cup in the afternoon.
+He feeds 1 cup in the morning and 1 cup in the afternoon.
+He feeds 1 cup in the morning and 1 cup in the afternoon.
+He feeds 1 cup in the morning and 1 cup in the afternoon.
+He feeds 1 cup in the morning and
+--------------------------------------------------------------------------------
+GT:   30
+PRED: None
+PROMPT (tail):
+<|endoftext|>You are a helpful assistant.
+User: Darlene's car gets 20 miles/gallon. Martha's car gets half as many miles per gallon as Darlene’s car. How many gallons does Martha’s car require to make a 300-mile trip?
+Assistant: 
+GEN (tail):
+<|endoftext|>You are a helpful assistant.
+User: Darlene's car gets 20 miles/gallon. Martha's car gets half as many miles per gallon as Darlene’s car. How many gallons does Martha’s car require to make a 300-mile trip?
+Assistant: Martha’s car gets 20/2=<<20/2=10>>10 miles/gallon.
+Martha’s car gets 20/1=<<20/1=10>>10 miles/gallon.
+Martha’s car gets 10/2=<<10/2=5>>5 miles/gallon.
+Martha’s car gets 5/2=<<5/2=3>>3 miles/gallon.
+Martha’s car gets 3/2=<<3/2=1>>1 gallon.
+Martha’s car gets 3/2=<<3/2=1>>1 gallon.
+Martha’s car gets 1/2=<<1/2=1>>1 gallon.
+Martha’s car gets 1/2=<<1/2=1>>1 gallon.
+Martha’s car gets 1/2=<<1/2=1>>1 gallon.
+Martha’s car gets 1/2=<<1/2=1>>1 gallon.
+Martha’s car gets 1/2=<<1/2=1>>1 gallon.
+Martha
+--------------------------------------------------------------------------------
+GT:   121
+PRED: None
+PROMPT (tail):
+<|endoftext|>You are a helpful assistant.
+User: Preston has a sandwich shop. He charges $5 for each sandwich. He also charges $20 for a delivery fee. Abra Company orders 18 sandwiches from Preston and also tips him 10%. How much total, in dollars, did Preston receive?
+Assistant: 
+GEN (tail):
+wiches and Preston has 18 sandwiches.
+Abra Company has 18 sandwiches and Preston has 18 sandwiches.
+Abra Company has 18 sandwiches and Preston has 18 sandwiches.
+Abra Company has 18 sandwiches and Preston has 18 sandwiches.
+Abra Company has 18 sandwiches and Preston has 18 sandwiches.
+Abra Company has 18 sandwiches and Preston has 18 sandwiches.
+Abra Company has 18 sandwiches and Preston has 18 sandwiches.
+Abra Company has 18 sandwiches and Preston has 18 sandwiches.
+Abra Company has 18 sandwiches and Preston has 18 sandwiches.
+Abra Company has 18 sandwiches and Preston has 18 sandwiches.
+Abra Company has 18 sandwiches and Preston has 18 sandwiches.
+Abra Company has 18 sandwiches and Preston has 18 sandwiches.
+Abra Company has 18 sandwiches and Preston has 18 sandwiches.
+Abra Company has 18 sandwiches and Preston has 18 sandwiches.
+Abra Company has 18 sandwiches and Preston has 18 sandwiches.
+Abra Company has 18 sandwiches and Preston has 18 sandwiches.
+Abra Company has 18 sandwiches and Preston has 18 sandwiches.
+Abra Company has 18 sandwiches and Preston has 18 sandwiches.
+Abra Company has 18 sandwiches and Preston has 18 sandwiches.
+Abra Company has 18 sandwiches and Preston has
+--------------------------------------------------------------------------------
+GT:   64
+PRED: 24
+PROMPT (tail):
+<|endoftext|>You are a helpful assistant.
+User: Four days ago, Carlos bought a bag of gummy worms. Every day he ate half of the remaining gummy worms. After eating half of the remainder on the fourth day, he now has 4 gummy worms left. How many gummy worms were in the bag when Carlos bought it?
+Assistant: 
+GEN (tail):
+<|endoftext|>You are a helpful assistant.
+User: Four days ago, Carlos bought a bag of gummy worms. Every day he ate half of the remaining gummy worms. After eating half of the remainder on the fourth day, he now has 4 gummy worms left. How many gummy worms were in the bag when Carlos bought it?
+Assistant: The gummy worms were 4*2=<<4*2=8>>8 on the fourth day.
+The remaining gummy worms were 8-2=<<8-2=4>>4 on the fifth day.
+The bag had 4*8=<<4*8=24>>24 gummy worms.
+Final Answer: 24
+<|endoftext|>
+--------------------------------------------------------------------------------
+GT:   50
+PRED: 10
+PROMPT (tail):
+<|endoftext|>You are a helpful assistant.
+User: John buys 5 notebooks that have 40 pages each.  He uses 4 pages per day.  How many days do the notebooks last?
+Assistant: 
+GEN (tail):
+<|endoftext|>You are a helpful assistant.
+User: John buys 5 notebooks that have 40 pages each.  He uses 4 pages per day.  How many days do the notebooks last?
+Assistant: He uses 4*40=<<4*40=120>>120 pages a day
+So he uses 120/4=<<120/4=20>>20 pages a day
+So he uses 20*4=<<20*4=80>>80 pages a day
+So he uses 80/20=<<80/20=10>>10 days a year
+Final Answer: 10
+<|endoftext|>
+====================================
+ckpt=my_gpt2/results/sft_gsm8k_cot_v2/best.pt
+dataset_dir=my_gpt2/source/datasets/gsm8k_sft_examples/gsm8k_train/gsm8k_cot prefix=gsm8k_cot
+evaluated=6726 correct=110 acc=0.0164
+====================================
+Job completed.
+
+============================= JOB FEEDBACK =============================
+
+NodeName=uc2n902
+Job ID: 3140052
+Cluster: uc3
+User/Group: ul_raf24/ul_student
+State: COMPLETED (exit code 0)
+Nodes: 1
+Cores per node: 2
+CPU Utilized: 00:47:31
+CPU Efficiency: 49.24% of 01:36:30 core-walltime
+Job Wall-clock time: 00:48:15
+Memory Utilized: 1.52 GB
+Memory Efficiency: 1.20% of 127.00 GB (127.00 GB/node)

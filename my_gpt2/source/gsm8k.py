@@ -1,6 +1,9 @@
+# my_gpt2/source/gsm8k.py
+
 import os
 import json
 import argparse
+import random
 from pathlib import Path
 from typing import List, Tuple, Optional
 
@@ -32,6 +35,7 @@ def parse_gsm8k_answer(ans: str) -> Tuple[str, str]:
         reasoning = parts[0].strip()
         final = parts[1].strip()
         return reasoning, final
+
     lines = [l.strip() for l in ans.splitlines() if l.strip()]
     if len(lines) == 0:
         return "", ""
@@ -59,24 +63,29 @@ def tokenize_gsm8k_example(
     ids: List[int] = []
     mask: List[int] = []
 
+    # start token (unsupervised)
     ids.append(eos_id)
     mask.append(0)
 
+    # optional system prompt (unsupervised)
     if add_system_prompt:
         sys_ids = _encode(enc, SYSTEM_PROMPT)
         ids.extend(sys_ids)
         mask.extend([0] * len(sys_ids))
 
+    # user segment (unsupervised)
     user_seg = f"User: {question}\n"
     user_ids = _encode(enc, user_seg)
     ids.extend(user_ids)
     mask.extend([0] * len(user_ids))
 
+    # assistant prefix (unsupervised)
     prefix = "Assistant: "
     prefix_ids = _encode(enc, prefix)
     ids.extend(prefix_ids)
     mask.extend([0] * len(prefix_ids))
 
+    # supervised content
     if mode == "cot":
         content = reasoning.strip()
         if content:
@@ -93,6 +102,7 @@ def tokenize_gsm8k_example(
     ids.extend(nl_ids)
     mask.extend([1] * len(nl_ids))
 
+    # end token (supervised optional)
     ids.append(eos_id)
     mask.append(1 if supervise_eos else 0)
 
@@ -123,6 +133,35 @@ def decode_full(enc, ids: List[int]) -> str:
         return "<decode failed>"
 
 
+def maybe_overwrite_dir(out_dir: Path, prefix: str, overwrite: bool):
+    out_dir.mkdir(parents=True, exist_ok=True)
+    if not overwrite:
+        return
+    # remove existing shard files for this prefix
+    for p in out_dir.glob(f"{prefix}_*.pt"):
+        try:
+            p.unlink()
+        except Exception:
+            pass
+    # remove meta.json if present (optional)
+    meta = out_dir / "meta.json"
+    if meta.exists():
+        try:
+            meta.unlink()
+        except Exception:
+            pass
+
+
+def split_indices(n: int, val_fraction: float, seed: int) -> Tuple[List[int], List[int]]:
+    idx = list(range(n))
+    rng = random.Random(seed)
+    rng.shuffle(idx)
+    n_val = max(1, int(n * val_fraction))
+    val_idx = idx[:n_val]
+    train_idx = idx[n_val:]
+    return train_idx, val_idx
+
+
 def build_split(
     out_dir: Path,
     repo: str,
@@ -136,26 +175,38 @@ def build_split(
     prefix: str,
     mode: str,
     do_test_prints: bool,
+    indices: Optional[List[int]] = None,
+    overwrite: bool = False,
 ):
-    out_dir.mkdir(parents=True, exist_ok=True)
+    maybe_overwrite_dir(out_dir, prefix, overwrite)
 
     enc = tiktoken.get_encoding("gpt2")
     eos_id = enc._special_tokens["<|endoftext|>"]  # 50256
 
     ds = load_dataset(repo, config_name, split=split) if config_name else load_dataset(repo, split=split)
-    total = len(ds) if num_examples == -1 else min(num_examples, len(ds))
+
+    if indices is None:
+        total_avail = len(ds)
+        total = total_avail if num_examples == -1 else min(num_examples, total_avail)
+        indices = list(range(total))
+    else:
+        # indices define the subset; optionally cap by num_examples
+        if num_examples != -1:
+            indices = indices[:num_examples]
+        total = len(indices)
 
     print(f"\nBuilding GSM8K examples | mode={mode} | split={split}")
     print(f"repo={repo} config={config_name} out_dir={out_dir}")
     print(f"num_examples={total} shard_size_examples={shard_size_examples}")
     print(f"system_prompt={add_system_prompt} supervise_eos={supervise_eos}")
+    print(f"overwrite={overwrite}")
 
     buffer = []
     shard_idx = 0
     n_written = 0
 
     pbar = tqdm(total=total)
-    for i in range(total):
+    for i in indices:
         ex = ds[i]
         ids, mask = tokenize_gsm8k_example(
             ex, enc, eos_id,
@@ -195,6 +246,7 @@ def build_split(
         "tokenizer": "tiktoken:gpt2",
         "eos_id": eos_id,
         "seed": seed,
+        "indices_subset": None if indices is None else f"{len(indices)} indices",
     }
     with open(out_dir / "meta.json", "w") as f:
         json.dump(meta, f, indent=2)
@@ -230,13 +282,23 @@ def main():
     ap.add_argument("--config", type=str, default="main")
     ap.add_argument("--split", type=str, default="train", choices=["train", "test"])
     ap.add_argument("--num_examples", type=int, default=-1, help="-1 = all examples")
-    ap.add_argument("--shard_size_examples", type=int, default=5_000)
+    ap.add_argument("--shard_size_examples", type=int, default=1000)
     ap.add_argument("--seed", type=int, default=42)
     ap.add_argument("--no_system_prompt", action="store_true")
     ap.add_argument("--no_supervise_eos", action="store_true")
     ap.add_argument("--mode", type=str, default="both", choices=["cot", "direct", "both"])
     ap.add_argument("--prefix", type=str, default="gsm8k")
     ap.add_argument("--no_test_prints", action="store_true")
+    ap.add_argument("--overwrite", action="store_true", help="Delete existing shards for the target prefix before writing")
+
+    # Option 1: build train/val from HF-train
+    ap.add_argument("--make_val_from_train", action="store_true",
+                    help="If set, take HF train split and split into train/val locally.")
+    ap.add_argument("--val_fraction", type=float, default=0.1,
+                    help="Fraction of HF train used for val when --make_val_from_train is set.")
+    ap.add_argument("--train_name", type=str, default="train")
+    ap.add_argument("--val_name", type=str, default="val")
+
     args = ap.parse_args()
 
     out_dir = Path(args.out_dir)
@@ -246,6 +308,87 @@ def main():
 
     config_name = args.config if args.config not in {"", "none", "None"} else None
 
+    if args.make_val_from_train:
+        # Always use HF train split and split locally
+        split = "train"
+        ds = load_dataset(args.repo, config_name, split=split) if config_name else load_dataset(args.repo, split=split)
+        n = len(ds)
+        train_idx, val_idx = split_indices(n, args.val_fraction, args.seed)
+
+        base = out_dir
+        train_base = base / f"{args.prefix}_{args.train_name}"
+        val_base = base / f"{args.prefix}_{args.val_name}"
+
+        if args.mode in {"cot", "both"}:
+            build_split(
+                out_dir=train_base / f"{args.prefix}_cot",
+                repo=args.repo,
+                config_name=config_name,
+                split=split,
+                num_examples=-1,
+                shard_size_examples=args.shard_size_examples,
+                seed=args.seed,
+                add_system_prompt=add_system_prompt,
+                supervise_eos=supervise_eos,
+                prefix=f"{args.prefix}_cot",
+                mode="cot",
+                do_test_prints=do_test_prints,
+                indices=train_idx,
+                overwrite=args.overwrite,
+            )
+            build_split(
+                out_dir=val_base / f"{args.prefix}_cot",
+                repo=args.repo,
+                config_name=config_name,
+                split=split,
+                num_examples=-1,
+                shard_size_examples=args.shard_size_examples,
+                seed=args.seed,
+                add_system_prompt=add_system_prompt,
+                supervise_eos=supervise_eos,
+                prefix=f"{args.prefix}_cot",
+                mode="cot",
+                do_test_prints=do_test_prints,
+                indices=val_idx,
+                overwrite=args.overwrite,
+            )
+
+        if args.mode in {"direct", "both"}:
+            build_split(
+                out_dir=train_base / f"{args.prefix}_direct",
+                repo=args.repo,
+                config_name=config_name,
+                split=split,
+                num_examples=-1,
+                shard_size_examples=args.shard_size_examples,
+                seed=args.seed,
+                add_system_prompt=add_system_prompt,
+                supervise_eos=supervise_eos,
+                prefix=f"{args.prefix}_direct",
+                mode="direct",
+                do_test_prints=do_test_prints,
+                indices=train_idx,
+                overwrite=args.overwrite,
+            )
+            build_split(
+                out_dir=val_base / f"{args.prefix}_direct",
+                repo=args.repo,
+                config_name=config_name,
+                split=split,
+                num_examples=-1,
+                shard_size_examples=args.shard_size_examples,
+                seed=args.seed,
+                add_system_prompt=add_system_prompt,
+                supervise_eos=supervise_eos,
+                prefix=f"{args.prefix}_direct",
+                mode="direct",
+                do_test_prints=do_test_prints,
+                indices=val_idx,
+                overwrite=args.overwrite,
+            )
+        return
+
+    # Default: build a single split (train OR test) like before
     if args.mode in {"cot", "both"}:
         build_split(
             out_dir=out_dir / f"{args.prefix}_cot",
@@ -260,6 +403,8 @@ def main():
             prefix=f"{args.prefix}_cot",
             mode="cot",
             do_test_prints=do_test_prints,
+            indices=None,
+            overwrite=args.overwrite,
         )
 
     if args.mode in {"direct", "both"}:
@@ -276,6 +421,8 @@ def main():
             prefix=f"{args.prefix}_direct",
             mode="direct",
             do_test_prints=do_test_prints,
+            indices=None,
+            overwrite=args.overwrite,
         )
 
 

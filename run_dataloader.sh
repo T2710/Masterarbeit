@@ -22,8 +22,28 @@ mkdir -p logs
 python -c "import torch; print('CUDA available:', torch.cuda.is_available()); \
 print('Device:', torch.cuda.get_device_name(0) if torch.cuda.is_available() else 'CPU')"
 
-python -m my_gpt2.source.dataloader --dataset edu_fineweb100B --max_tokens 30000000000
+# python -m my_gpt2.source.dataloader --dataset edu_fineweb100B --max_tokens 30000000000
 # python -m my_gpt2.source.ultrachat --out_dir my_gpt2/source/datasets/ultrachat_sft_examples --num_examples -1 --shard_size_examples 10000
+
+# gsm8k dataset train
+python -m my_gpt2.source.gsm8k \
+  --out_dir my_gpt2/source/datasets/gsm8k_sft_examples \
+  --make_val_from_train \
+  --val_fraction 0.1 \
+  --split train \
+  --mode both \
+  --prefix gsm8k \
+  --shard_size_examples 1000 \
+  --overwrite
+# test
+python -m my_gpt2.source.gsm8k \
+  --out_dir my_gpt2/source/datasets/gsm8k_sft_examples \
+  --split test \
+  --mode both \
+  --prefix gsm8k_test \
+  --shard_size_examples 2000 \
+  --overwrite
+
 
 echo "Job completed."
 

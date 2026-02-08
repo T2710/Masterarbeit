@@ -1,7 +1,7 @@
 #!/bin/bash
 #SBATCH --job-name=RunSimulation
-#SBATCH --output=logs/logs_reasoning_true_%j.out
-#SBATCH --error=logs/logs_reasoning_true_%j.err
+#SBATCH --output=logs/logs_reasoning_%j.out
+#SBATCH --error=logs/logs_reasoning_%j.err
 #SBATCH --time=01:00:00
 #SBATCH --ntasks=1
 #SBATCH --cpus-per-task=2
@@ -25,25 +25,63 @@ print('Device:', torch.cuda.get_device_name(0) if torch.cuda.is_available() else
 
 # # No Reasoning
 # python -m my_gpt2.source.sft_train \
-#   --data_dir my_gpt2/source/datasets/gsm8k_sft_examples/gsm8k_direct \
+#   --data_dir my_gpt2/source/datasets/gsm8k_sft_examples/gsm8k_train/gsm8k_direct \
 #   --prefix gsm8k_direct \
+#   --val_dir my_gpt2/source/datasets/gsm8k_sft_examples/gsm8k_val/gsm8k_direct \
 #   --pretrain_ckpt my_gpt2/results/sft_ultrachat/best.pt \
-#   --out_dir my_gpt2/results/sft_gsm8k_direct \
-#   --max_steps 1170 \
-#   --eval_every 200 \
-#   --max_train_examples -1 \
-#   --save_every 500
+#   --out_dir my_gpt2/results/sft_gsm8k_direct_v2 \
+#   --max_steps 422 \
+#   --eval_every 25 \
+#   --lr 1e-5 \
+#   --save_every 50 \
+#   --max_val_examples -1
 
+# # With Reasoning (COT)
+# python -m my_gpt2.source.sft_train \
+#   --data_dir my_gpt2/source/datasets/gsm8k_sft_examples/gsm8k_train/gsm8k_cot \
+#   --prefix gsm8k_cot \
+#   --val_dir my_gpt2/source/datasets/gsm8k_sft_examples/gsm8k_val/gsm8k_cot \
+#   --pretrain_ckpt my_gpt2/results/sft_ultrachat/best.pt \
+#   --out_dir my_gpt2/results/sft_gsm8k_cot_v2 \
+#   --max_steps 422 \
+#   --eval_every 25 \
+#   --lr 1e-5 \
+#   --save_every 50 \
+#   --max_val_examples -1
+
+# Evaluate the model on GSM8K test set no reasoing
+echo "Eval without Reasoning:"
+# python -m my_gpt2.source.eval_gsm8k_accuracy \
+#   --data_dir my_gpt2/source/datasets/gsm8k_sft_examples/gsm8k_test_direct \
+#   --prefix gsm8k_test_direct \
+#   --ckpt my_gpt2/results/sft_gsm8k_direct_v2/best.pt \
+#   --max_new_tokens 64 \
+#   --amp
+
+python -m my_gpt2.source.eval_gsm8k_accuracy \
+  --data_dir my_gpt2/source/datasets/gsm8k_sft_examples/gsm8k_train/gsm8k_direct \
+  --prefix gsm8k_direct \
+  --ckpt my_gpt2/results/sft_gsm8k_direct_v2/best.pt \
+  --max_new_tokens 128 \
+  --amp
+
+
+echo "Eval with Reasoning:"
 # With Reasoning (COT)
-python -m my_gpt2.source.sft_train \
-  --data_dir my_gpt2/source/datasets/gsm8k_sft_examples/gsm8k_cot \
+# python -m my_gpt2.source.eval_gsm8k_accuracy \
+#   --data_dir my_gpt2/source/datasets/gsm8k_sft_examples/gsm8k_test_cot \
+#   --prefix gsm8k_test_cot \
+#   --ckpt my_gpt2/results/sft_gsm8k_cot_v2/best.pt \
+#   --max_new_tokens 256 \
+#   --amp
+
+python -m my_gpt2.source.eval_gsm8k_accuracy \
+  --data_dir my_gpt2/source/datasets/gsm8k_sft_examples/gsm8k_train/gsm8k_cot \
   --prefix gsm8k_cot \
-  --pretrain_ckpt my_gpt2/results/sft_ultrachat/best.pt \
-  --out_dir my_gpt2/results/sft_gsm8k_cot \
-  --max_steps 1170 \
-  --eval_every 200 \
-  --max_train_examples -1 \
-  --save_every 500
+  --ckpt my_gpt2/results/sft_gsm8k_cot_v2/best.pt \
+  --max_new_tokens 256 \
+  --amp
+
 
 
 echo "Job completed."
