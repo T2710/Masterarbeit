@@ -2,12 +2,12 @@
 #SBATCH --job-name=RunSimulation
 #SBATCH --output=logs/Logs_dataloader_%j.out
 #SBATCH --error=logs/Logs_dataloader_%j.err
-#SBATCH --time=04:00:00
+#SBATCH --time=00:30:00
 #SBATCH --ntasks=1
 #SBATCH --cpus-per-task=2
 #SBATCH --mem=127G
 #SBATCH --gres=gpu:1
-#SBATCH --partition=gpu_a100_il
+#SBATCH --partition=dev_gpu_h100
 
 echo "Job started ..."
 
@@ -22,26 +22,34 @@ mkdir -p logs
 python -c "import torch; print('CUDA available:', torch.cuda.is_available()); \
 print('Device:', torch.cuda.get_device_name(0) if torch.cuda.is_available() else 'CPU')"
 
-# python -m my_gpt2.source.dataloader --dataset edu_fineweb100B --max_tokens 30000000000
+# python -m my_gpt2.source.dataloader --dataset edu_fineweb100B --max_tokens 15000000000
 # python -m my_gpt2.source.ultrachat --out_dir my_gpt2/source/datasets/ultrachat_sft_examples --num_examples -1 --shard_size_examples 10000
 
-# gsm8k dataset train
-python -m my_gpt2.source.gsm8k \
-  --out_dir my_gpt2/source/datasets/gsm8k_sft_examples \
+# gsm8k dataset 
+# python my_gpt2/source/gsm8k.py \
+#   --out_dir my_gpt2/source/datasets/gsm8k_ab \
+#   --mode both \
+#   --val_fraction 0.1 \
+#   --shard_size_examples 1000 \
+#   --max_seq_len 1024 \
+#   --supervise_eos \
+#   --overwrite
+
+# python my_gpt2/source/dataloader.py \
+#   --dataset openwebmath \
+#   --base_dir my_gpt2/source/datasets \
+#   --max_tokens 5000000000
+
+
+# # orca_math dataset
+python -m my_gpt2.source.orca_math \
+  --out_dir my_gpt2/source/datasets/orca_math \
+  --num_examples 100000 \
   --make_val_from_train \
   --val_fraction 0.1 \
-  --split train \
+  --max_seq_len 1024 \
   --mode both \
-  --prefix gsm8k \
-  --shard_size_examples 1000 \
-  --overwrite
-# test
-python -m my_gpt2.source.gsm8k \
-  --out_dir my_gpt2/source/datasets/gsm8k_sft_examples \
-  --split test \
-  --mode both \
-  --prefix gsm8k_test \
-  --shard_size_examples 2000 \
+  --supervise_eos \
   --overwrite
 
 
