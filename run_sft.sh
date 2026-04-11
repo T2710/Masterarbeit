@@ -2,12 +2,12 @@
 #SBATCH --job-name=RunSimulation
 #SBATCH --output=logs/Logs_sft_%j.out
 #SBATCH --error=logs/Logs_sft_%j.err
-#SBATCH --time=00:30:00
+#SBATCH --time=03:30:00
 #SBATCH --ntasks=1
 #SBATCH --cpus-per-task=2
 #SBATCH --mem=127G
 #SBATCH --gres=gpu:1
-#SBATCH --partition=dev_gpu_h100
+#SBATCH --partition=gpu_h100
 
 
 echo "Job started ..."
@@ -27,11 +27,11 @@ print('Device:', torch.cuda.get_device_name(0) if torch.cuda.is_available() else
 # python -m my_gpt2.source.instruction_sft \
 #   --model gpt2-medium \
 #   --init_checkpoint my_gpt2/results/continued_pretraining_openwebmath/gpt2-medium_owm_5b/gpt2-medium_model_09536.pt \
-#   --data_root my_gpt2/source/datasets/orca_math_direct \
+#   --data_root my_gpt2/source/datasets/orca_math \
 #   --train_split train_direct \
 #   --val_split val_direct \
 #   --output_root my_gpt2/results/instruction_sft \
-#   --run_name orca_math_sft \
+#   --run_name orca_math_sft_200k \
 #   --epochs 1 \
 #   --batch_size 8 \
 #   --grad_accum_steps 4 \
@@ -42,30 +42,30 @@ print('Device:', torch.cuda.get_device_name(0) if torch.cuda.is_available() else
 # Directly fine-tune the model on GSM8K dataset without reasoning (direct answer)
 python -m my_gpt2.source.instruction_sft \
   --model gpt2-medium \
-  --init_checkpoint my_gpt2/results/instruction_sft/orca_math_sft/ckpt_02812.pt \
+  --init_checkpoint my_gpt2/results/instruction_sft/orca_math_sft_200k/best.pt \
   --data_root my_gpt2/source/datasets/gsm8k_ab \
   --train_split train_direct \
   --val_split val_direct \
   --output_root my_gpt2/results/instruction_sft \
-  --run_name gsm8k_direct \
+  --run_name gsm8k_direct_200k \
   --epochs 4 \
   --batch_size 4 \
   --grad_accum_steps 2 \
   --max_lr 2e-5
 
 #  Fine-tune the model on GSM8K dataset with reasoning (chain-of-thought)
-python -m my_gpt2.source.instruction_sft \
-  --model gpt2-medium \
-  --init_checkpoint my_gpt2/results/instruction_sft/orca_math_sft/ckpt_02812.pt \
-  --data_root my_gpt2/source/datasets/gsm8k_ab \
-  --train_split train_cot \
-  --val_split val_cot \
-  --output_root my_gpt2/results/instruction_sft \
-  --run_name gsm8k_cot \
-  --epochs 4 \
-  --batch_size 4 \
-  --grad_accum_steps 2 \
-  --max_lr 2e-5
+# python -m my_gpt2.source.instruction_sft \
+#   --model gpt2-medium \
+#   --init_checkpoint my_gpt2/results/instruction_sft/orca_math_sft_cot/ckpt_02812.pt \
+#   --data_root my_gpt2/source/datasets/gsm8k_ab \
+#   --train_split train_cot \
+#   --val_split val_cot \
+#   --output_root my_gpt2/results/instruction_sft \
+#   --run_name gsm8k_cotX2 \
+#   --epochs 4 \
+#   --batch_size 4 \
+#   --grad_accum_steps 2 \
+#   --max_lr 2e-5
 
 
 

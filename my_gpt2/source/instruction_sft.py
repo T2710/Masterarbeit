@@ -208,7 +208,7 @@ def _extract_question_from_prompt(prompt_text: str) -> str:
 
 
 @torch.no_grad()
-def preview_generations(model, dataset, device, device_type, eos_id: int, max_new_tokens: int = 120, num_samples: int = 5):
+def preview_generations(model, dataset, device, device_type, eos_id: int, max_new_tokens: int = 256, num_samples: int = 5):
     """
     Prints a few qualitative validation examples during training.
     For each example, shows:
@@ -497,7 +497,7 @@ def main():
                     device,
                     device_type,
                     eos_id=eos_id,
-                    max_new_tokens=120,
+                    max_new_tokens=256,
                     num_samples=5,
                 )
 

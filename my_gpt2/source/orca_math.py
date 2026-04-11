@@ -108,6 +108,81 @@ def normalize_reasoning(text: str) -> str:
     return (text or '').strip()
 
 
+def normalize_for_compare(text: str) -> str:
+    text = (text or '').strip().rstrip('.。')
+    text = text.replace(',', '')
+    text = re.sub(r'\s+', ' ', text)
+    return text.lower()
+
+
+def matches_final_answer(text: str, final_answer: str) -> bool:
+    norm_final = normalize_for_compare(final_answer)
+    if not norm_final:
+        return False
+
+    norm_text = normalize_for_compare(text)
+    if not norm_text:
+        return False
+    if norm_text == norm_final:
+        return True
+
+    last_num = extract_last_number(text)
+    if last_num and normalize_for_compare(last_num) == norm_final:
+        return True
+
+    return False
+
+
+def is_redundant_answer_statement(text: str, final_answer: str) -> bool:
+    stripped = (text or '').strip()
+    if not stripped:
+        return False
+
+    low = stripped.lower()
+    if matches_final_answer(stripped, final_answer):
+        if low.startswith(('final answer', 'answer:', 'the answer is')):
+            return True
+        if low.startswith(('therefore', 'thus', 'hence', 'so', 'in conclusion')):
+            return True
+        if normalize_for_compare(stripped) == normalize_for_compare(final_answer):
+            return True
+
+    return False
+
+
+def extract_reasoning(raw_answer: str, final_answer: str) -> str:
+    text = normalize_reasoning(raw_answer)
+    if not text:
+        return ''
+
+    lines = [line.rstrip() for line in text.splitlines()]
+    while lines:
+        idx = len(lines) - 1
+        while idx >= 0 and not lines[idx].strip():
+            idx -= 1
+        if idx < 0:
+            return ''
+
+        nonempty_count = sum(1 for line in lines if line.strip())
+        last_line = lines[idx].strip()
+        if nonempty_count >= 2 and is_redundant_answer_statement(last_line, final_answer):
+            lines = lines[:idx]
+            continue
+        break
+
+    text = '\n'.join(lines).strip()
+    sentences = split_sentences(text)
+    while len(sentences) >= 2 and is_redundant_answer_statement(sentences[-1], final_answer):
+        sentences.pop()
+    if len(sentences) == 1 and is_redundant_answer_statement(sentences[0], final_answer):
+        return ''
+
+    cleaned = '\n'.join(sentences) if sentences else text
+    if normalize_for_compare(cleaned) == normalize_for_compare(final_answer):
+        return ''
+    return normalize_reasoning(cleaned)
+
+
 def pick_question_and_answer(example: Dict[str, Any]) -> Tuple[str, str]:
     question_keys = ['question', 'problem', 'instruction', 'input']
     answer_keys = ['answer', 'output', 'response', 'solution']
@@ -171,7 +246,7 @@ def tokenize_example(
     if not final_answer:
         return None
 
-    reasoning = raw_answer.strip()
+    reasoning = extract_reasoning(raw_answer, final_answer)
     prompt_text, target_text = build_prompt_and_target(question, final_answer, reasoning, mode)
 
     prompt_ids = _encode(enc, prompt_text)
@@ -352,7 +427,7 @@ def build_mode_split(
         'avg_supervised_tokens': (total_supervised_tokens / n_written) if n_written else 0.0,
         'sequence_format': {
             'direct': 'Question:\\n<task>\\n\\nFinal Answer:\\n<answer>',
-            'cot': 'Question:\\n<task>\\n\\nReasoning:\\n<full solution>\\n\\nFinal Answer:\\n<answer>',
+            'cot': 'Question:\\n<task>\\n\\nReasoning:\\n<solution steps without duplicated final answer>\\n\\nFinal Answer:\\n<answer>',
         },
     }
     with open(out_dir / 'meta.json', 'w', encoding='utf-8') as f:

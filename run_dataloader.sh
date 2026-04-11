@@ -2,12 +2,12 @@
 #SBATCH --job-name=RunSimulation
 #SBATCH --output=logs/Logs_dataloader_%j.out
 #SBATCH --error=logs/Logs_dataloader_%j.err
-#SBATCH --time=00:30:00
+#SBATCH --time=03:30:00
 #SBATCH --ntasks=1
 #SBATCH --cpus-per-task=2
-#SBATCH --mem=127G
+#SBATCH --mem=190G
 #SBATCH --gres=gpu:1
-#SBATCH --partition=dev_gpu_h100
+#SBATCH --partition=gpu_h100
 
 echo "Job started ..."
 
@@ -22,7 +22,7 @@ mkdir -p logs
 python -c "import torch; print('CUDA available:', torch.cuda.is_available()); \
 print('Device:', torch.cuda.get_device_name(0) if torch.cuda.is_available() else 'CPU')"
 
-# python -m my_gpt2.source.dataloader --dataset edu_fineweb100B --max_tokens 15000000000
+# python -m my_gpt2.source.dataloader --dataset edu_fineweb100B --max_tokens 100000000000
 # python -m my_gpt2.source.ultrachat --out_dir my_gpt2/source/datasets/ultrachat_sft_examples --num_examples -1 --shard_size_examples 10000
 
 # gsm8k dataset 
@@ -41,7 +41,7 @@ print('Device:', torch.cuda.get_device_name(0) if torch.cuda.is_available() else
 #   --max_tokens 5000000000
 
 
-# # orca_math dataset
+# orca_math dataset
 python -m my_gpt2.source.orca_math \
   --out_dir my_gpt2/source/datasets/orca_math \
   --num_examples 100000 \
@@ -67,4 +67,3 @@ echo "Job completed."
 # salloc --partition=dev_gpu_h100 --ntasks=1 --time=30 --mem=5000 --gres=gpu:1
 # python -m my_gpt2.source.train
 # torchrun --standalone --nproc_per_node=1 -m my_gpt2.source.train
-

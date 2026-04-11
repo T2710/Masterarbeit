@@ -1,0 +1,55 @@
+Job started ...
+CUDA available: True
+Device: NVIDIA H100
+Direct_SFT on orca_mat (100k) and GSM8K: 
+{
+  "checkpoint": "my_gpt2/results/instruction_sft/gsm8k_direct/best.pt",
+  "test_split": "test_direct",
+  "mode": "direct",
+  "num_examples": 1319,
+  "exact_correct": 76,
+  "exact_accuracy": 0.0576194086429113
+}
+Direct_SFT on orca_math (200k) and GSM8K: 
+{
+  "checkpoint": "my_gpt2/results/instruction_sft/gsm8k_direct_200k/best.pt",
+  "test_split": "test_direct",
+  "mode": "direct",
+  "num_examples": 1319,
+  "exact_correct": 64,
+  "exact_accuracy": 0.04852160727824109
+}
+Direct_SFT on orca_math and CoT_SFT onGSM8K: 
+{
+  "checkpoint": "my_gpt2/results/instruction_sft/gsm8k_cot/best.pt",
+  "test_split": "test_cot",
+  "mode": "cot",
+  "num_examples": 1319,
+  "exact_correct": 77,
+  "exact_accuracy": 0.058377558756633814
+}
+CoT_SFT on orca_math and GSM8K: 
+{
+  "checkpoint": "my_gpt2/results/instruction_sft/gsm8k_cotX2/best.pt",
+  "test_split": "test_cot",
+  "mode": "cot",
+  "num_examples": 1319,
+  "exact_correct": 104,
+  "exact_accuracy": 0.07884761182714177
+}
+Job completed.
+
+============================= JOB FEEDBACK =============================
+
+NodeName=uc3n075
+Job ID: 3363030
+Cluster: uc3
+User/Group: ul_raf24/ul_student
+State: COMPLETED (exit code 0)
+Nodes: 1
+Cores per node: 2
+CPU Utilized: 00:30:05
+CPU Efficiency: 48.81% of 01:01:38 core-walltime
+Job Wall-clock time: 00:30:49
+Memory Utilized: 1.77 GB
+Memory Efficiency: 1.40% of 127.00 GB (127.00 GB/node)
