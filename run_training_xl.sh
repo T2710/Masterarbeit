@@ -26,23 +26,27 @@ python -c "import torch; print('CUDA available:', torch.cuda.is_available()); pr
 
 forward_usr1() {
   if [[ -n "${TORCHRUN_PID:-}" ]] && kill -0 "$TORCHRUN_PID" 2>/dev/null; then
-    echo "Forwarding USR1 to torchrun (pid $TORCHRUN_PID) ..."
-    kill -USR1 "$TORCHRUN_PID" 2>/dev/null || true
-    pkill -USR1 -P "$TORCHRUN_PID" 2>/dev/null || true
+    echo "Forwarding USR1 to torchrun process group (-$TORCHRUN_PID) ..."
+    kill -USR1 -- "-$TORCHRUN_PID" 2>/dev/null || true
   fi
 }
 
 trap forward_usr1 USR1
 
-torchrun --standalone --nproc_per_node=4 -m my_gpt2.source.pretrain \
-  --model gpt2-xl \
-  --data_root my_gpt2/source/datasets/edu_fineweb100B \
-  --log_dir my_gpt2/results/pretraining/log_pretraining \
-  --tokens_target 100000000000 \
-  --total_batch_size 524288 \
-  --B 8 --T 1024 \
-  --max_lr 2.5e-4 --warmup_steps 2000 \
-  --eval_every 2000 --ckpt_every 5000 &
+setsid bash -lc '
+  source ~/.bashrc
+  conda activate llm-env
+  cd /pfs/data6/home/ul/ul_student/ul_raf24/project/Masterarbeit
+  exec torchrun --standalone --nproc_per_node=4 -m my_gpt2.source.pretrain \
+    --model gpt2-xl \
+    --data_root my_gpt2/source/datasets/edu_fineweb100B \
+    --log_dir my_gpt2/results/pretraining/log_pretraining \
+    --tokens_target 100000000000 \
+    --total_batch_size 524288 \
+    --B 8 --T 1024 \
+    --max_lr 1.5e-4 --warmup_steps 8000 \
+    --eval_every 2000 --ckpt_every 10000
+' &
 TORCHRUN_PID=$!
 set +e
 wait "$TORCHRUN_PID"
